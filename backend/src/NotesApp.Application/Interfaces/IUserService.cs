@@ -11,4 +11,6 @@ public interface IUserService
     Task<bool> DeleteByUserAsync(Guid id);
     Task UpdateUserAsync(User user);
     Task<UserDto> AddUserAsync(CreateUserDto userDto);
+    Task<string> HashPassword(string password);
+    Task<bool> VerifyPassword(string password, string hashedPassword);
 }

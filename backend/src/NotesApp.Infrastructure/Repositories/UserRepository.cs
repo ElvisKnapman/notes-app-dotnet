@@ -5,38 +5,49 @@ namespace NotesApp.Infrastructure.Repositories;
 
 public class UserRepository : IUserRepository
 {
-    public Task AddAsync(User user)
+    private static List<User> _users = [];
+
+    public async Task<User> AddAsync(User user)
     {
-        throw new NotImplementedException();
+        _users.Add(user);
+        return user;
     }
 
-    public Task<bool> DeleteByIdAsync(Guid id)
+    public async Task<bool> DeleteByIdAsync(Guid id)
     {
-        throw new NotImplementedException();
+        var user = _users.Find(u => u.Id == id);
+
+        if (user is null) return false;
+
+        _users.Remove(user);
+        return true;
     }
 
-    public Task<bool> ExistsAsync(Guid id)
+    public async Task<bool> ExistsAsync(Guid id)
     {
-        throw new NotImplementedException();
+        return _users.Any(u => u.Id == id);
     }
 
-    public Task<List<User>> GetAllAsync()
+    public async Task<List<User>> GetAllAsync()
     {
-        throw new NotImplementedException();
+        return _users.ToList();
     }
 
-    public Task<User?> GetByEmailAsync(string email)
+    public async Task<User?> GetByEmailAsync(string email)
     {
-        throw new NotImplementedException();
+        return _users.Find(u => u.Email == email);
     }
 
-    public Task<User?> GetByIdAsync(Guid id)
+    public async Task<User?> GetByIdAsync(Guid id)
     {
-        throw new NotImplementedException();
+        return _users.Find(u => u.Id == id);
     }
 
-    public Task UpdateAsync(User user)
+    public async Task UpdateAsync(User user)
     {
-        throw new NotImplementedException();
+        var index = _users.FindIndex(u => u.Id == user.Id);
+
+        _users.RemoveAt(index);
+        _users.Add(user);
     }
 }

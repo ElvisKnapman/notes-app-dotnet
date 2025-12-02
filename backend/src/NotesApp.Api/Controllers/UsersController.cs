@@ -43,4 +43,10 @@ public class UsersController : ControllerBase
 
         return CreatedAtAction(nameof(GetById), new { Id = userDto.Id }, userDto);
     }
+
+    [HttpPost("hash-password")]
+    public async Task<ActionResult<string>> HashPassword([FromBody] string password)
+    { 
+        return Ok(await _userService.HashPassword(password));
+    }
 }

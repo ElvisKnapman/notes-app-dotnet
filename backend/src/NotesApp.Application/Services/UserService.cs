@@ -7,39 +7,56 @@ namespace NotesApp.Application.Services;
 
 public class UserService : IUserService
 {
-    private static List<User> _users = [];
-
     private readonly IUserRepository _userRepo;
+    private readonly IPasswordHasher _passwordHasher;
 
-    public UserService(IUserRepository userRepo)
+    public UserService(IUserRepository userRepo, IPasswordHasher passwordHasher)
     {
         _userRepo = userRepo;
+        _passwordHasher = passwordHasher;
     }
 
     public async Task<UserDto> AddUserAsync(CreateUserDto userDto)
     {
-        _users.Add(userDto.ToUserEntity());
+        var user = await _userRepo.AddAsync(userDto.ToUserEntity());
         return userDto.ToUserDto();
     }
 
     public async Task<bool> DeleteByUserAsync(Guid id)
     {
-        throw new NotImplementedException();
+        return await _userRepo.DeleteByIdAsync(id);
+
     }
 
     public async Task<IEnumerable<UserDto>> GetAllUsersAsync()
     {
-        return _users.Select(user => user.ToUserDto());
+        var users = await _userRepo.GetAllAsync();
+
+        return users.Select(user => user.ToUserDto());
     }
 
     public async Task<UserDto?> GetUserByEmailAsync(string email)
     {
-        throw new NotImplementedException();
+        var user = await _userRepo.GetByEmailAsync(email);
+
+        return user?.ToUserDto();
     }
 
     public async Task<UserDto?> GetUserByIdAsync(Guid id)
     {
-        return _users.Find(u => u.Id == id)?.ToUserDto();
+        var user = await _userRepo.GetByIdAsync(id);
+
+        return user?.ToUserDto();
+    }
+
+    public async Task<string> HashPassword(string password)
+    {
+        return _passwordHasher.Hash(password);
+    }
+
+    public async Task<bool> VerifyPassword(string password, string hashedPassword)
+    {
+        return _passwordHasher.Verify(password, hashedPassword);
     }
 
     public async Task UpdateUserAsync(User user)
