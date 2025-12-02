@@ -1,10 +1,8 @@
-﻿using Application.DTOs;
-using Application.Interfaces;
-using Application.Mappers;
-using Domain.Entities;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
+using NotesApp.Application.DTOs;
+using NotesApp.Application.Interfaces;
 
-namespace Test.Api.Controllers;
+namespace NotesApp.Api.Controllers;
 
 [Route("api/users")]
 [ApiController]

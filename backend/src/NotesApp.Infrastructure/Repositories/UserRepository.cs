@@ -1,5 +1,5 @@
-﻿using Application.Interfaces;
-using Domain.Entities;
+﻿using NotesApp.Application.Interfaces;
+using NotesApp.Domain.Entities;
 
 namespace NotesApp.Infrastructure.Repositories;
 

@@ -1,7 +1,7 @@
-﻿using Application.DTOs;
-using Domain.Entities;
+﻿using NotesApp.Application.DTOs;
+using NotesApp.Domain.Entities;
 
-namespace Application.Interfaces;
+namespace NotesApp.Application.Interfaces;
 
 public interface IUserService
 {

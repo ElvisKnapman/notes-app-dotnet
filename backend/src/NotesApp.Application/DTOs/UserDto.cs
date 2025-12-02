@@ -1,4 +1,4 @@
-﻿namespace Application.DTOs;
+﻿namespace NotesApp.Application.DTOs;
 
 public class UserDto
 {

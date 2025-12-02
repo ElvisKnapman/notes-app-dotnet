@@ -1,6 +1,6 @@
-﻿using Domain.Entities;
+﻿using NotesApp.Domain.Entities;
 
-namespace Application.Interfaces;
+namespace NotesApp.Application.Interfaces;
 
 public interface IUserRepository
 {

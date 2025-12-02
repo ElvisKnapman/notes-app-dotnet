@@ -1,5 +1,5 @@
-using Application.Interfaces;
-using Application.Services;
+using NotesApp.Application.Interfaces;
+using NotesApp.Application.Services;
 using NotesApp.Infrastructure.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);

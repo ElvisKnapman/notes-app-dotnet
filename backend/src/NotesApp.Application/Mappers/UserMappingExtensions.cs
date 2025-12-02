@@ -1,7 +1,7 @@
-﻿using Application.DTOs;
-using Domain.Entities;
+﻿using NotesApp.Application.DTOs;
+using NotesApp.Domain.Entities;
 
-namespace Application.Mappers;
+namespace NotesApp.Application.Mappers;
 
 public static class UserMappingExtensions
 {

@@ -1,13 +1,20 @@
-﻿using Application.DTOs;
-using Application.Interfaces;
-using Application.Mappers;
-using Domain.Entities;
+﻿using NotesApp.Application.DTOs;
+using NotesApp.Application.Interfaces;
+using NotesApp.Application.Mappers;
+using NotesApp.Domain.Entities;
 
-namespace Application.Services;
+namespace NotesApp.Application.Services;
 
 public class UserService : IUserService
 {
     private static List<User> _users = [];
+
+    private readonly IUserRepository _userRepo;
+
+    public UserService(IUserRepository userRepo)
+    {
+        _userRepo = userRepo;
+    }
 
     public async Task<UserDto> AddUserAsync(CreateUserDto userDto)
     {

@@ -1,4 +1,4 @@
-﻿namespace Domain.Common;
+﻿namespace NotesApp.Domain.Common;
 
 public class Result<T>
 {
