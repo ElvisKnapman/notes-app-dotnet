@@ -4,4 +4,4 @@ using System.Text;
 
 namespace NotesApp.Application.DTOs;
 
-public record CreateUserDto(string? Username, string? Email, string? Password);
+public record UpdateUserDto(string? Username, string? Email);

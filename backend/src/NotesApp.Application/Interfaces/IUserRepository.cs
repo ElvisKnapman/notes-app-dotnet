@@ -10,9 +10,13 @@ public interface IUserRepository
     Task<User?> GetByEmailAsync(string email);
     Task<User?> GetByEmailNoTrackingAsync(string email);
     Task<User> AddAsync(User user);
-    Task UpdateAsync(User user);
     Task<bool> DeleteByIdAsync(Guid id);
-    Task<bool> ExistsAsync(Guid id);
-    Task<bool> ExistsAsync(string email);
-    Task<bool> ExistsAsync(string email, string username);
+    Task<bool> ExistsByIdAsync(Guid id);
+    Task<bool> ExistsByEmailAsync(string email);
+    Task<bool> ExistsByEmailAsync(string email, Guid id);
+    Task<bool> ExistsByUsernameAsync(string username);
+    Task<bool> ExistsByUsernameAsync(string username, Guid id);
+    Task<bool> ExistsByEmailAndUsernameAsync(string email, string username);
+    Task<bool> UpdateAsync(User user);
+    Task<bool> SaveChangesAsync();
 }

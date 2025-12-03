@@ -24,7 +24,7 @@ public class UsersController : ControllerBase
         return Ok(users);
     }
 
-    [HttpGet("{id}")] 
+    [HttpGet("{id:guid}")] 
     public async Task<ActionResult<UserDto>> GetById(Guid id)
     {
         var user = await _userService.GetUserByIdAsync(id);
@@ -54,5 +54,17 @@ public class UsersController : ControllerBase
     public async Task<ActionResult<string>> HashPassword([FromBody] string password)
     { 
         return Ok(await _userService.HashPassword(password));
+    }
+
+    [HttpPut("{id:guid}")]
+    public async Task<ActionResult> UpdateUser(Guid id, [FromBody] UpdateUserDto updateDto)
+    {
+        // Try to do the update
+        
+        
+        // Check the result
+
+
+        // Return the responses
     }
 }
