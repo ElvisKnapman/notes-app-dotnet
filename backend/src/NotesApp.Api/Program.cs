@@ -1,5 +1,7 @@
+using Microsoft.EntityFrameworkCore;
 using NotesApp.Application.Interfaces;
 using NotesApp.Application.Services;
+using NotesApp.Infrastructure.Persistence;
 using NotesApp.Infrastructure.Repositories;
 using NotesApp.Infrastructure.Security;
 
@@ -15,6 +17,11 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IPasswordHasher, BCryptPasswordHasher>();
+
+builder.Services.AddDbContext<AppDbContext>(options =>
+{
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DBConnection"));
+});
 
 var app = builder.Build();
 
