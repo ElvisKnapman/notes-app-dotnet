@@ -57,11 +57,12 @@ public class UsersController : ControllerBase
     }
 
     [HttpPut("{id:guid}")]
-    public async Task<ActionResult> UpdateUser(Guid id, [FromBody] UpdateUserDto updateDto)
+    public async Task<ActionResult> UpdateUser(Guid Id, [FromBody] UpdateUserDto updateDto)
     {
+
         // Try to do the update
-        
-        
+
+
         // Check the result
 
 
