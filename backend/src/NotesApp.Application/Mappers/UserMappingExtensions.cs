@@ -7,24 +7,10 @@ public static class UserMappingExtensions
 {
     public static UserDto ToUserDto(this User user)
     {
-        return new()
-        {
-            Id = user.Id,
-            Username = user.Username,
-            Email = user.Email,
-            CreatedAt = user.CreatedAt,
-            UpdatedAt = user.UpdatedAt
-        };
+        return new(user.Id, user.Username, user.Email, user.CreatedAt, user.UpdatedAt);
+        
     }
 
-    public static UserDto ToUserDto(this CreateUserDto userDto)
-    {
-        return new()
-        {
-            Username = userDto.Username ?? "",
-            Email = userDto.Email ?? ""
-        };
-    }
 
     public static User ToUserEntity(this CreateUserDto userDto)
     {

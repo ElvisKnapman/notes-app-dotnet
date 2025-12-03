@@ -34,7 +34,7 @@ public class UserService : IUserService
         }
 
         // Check if user with the same email already exists in DB
-        var userExists = await _userRepo.ExistsAsync(userDto.Email, userDto.Username);
+        var userExists = await _userRepo.ExistsByEmailAndUsernameAsync(userDto.Email, userDto.Username);
 
         if (userExists)
         {
@@ -56,6 +56,58 @@ public class UserService : IUserService
 
         return Result<UserDto>.Ok(createdUser.ToUserDto());
     }
+
+    public async Task<Result<UserDto>> UpdateUserAsync(Guid id, UpdateUserDto updateDto)
+    {
+        _logger.LogInformation("Attempting to update user with ID: {ID}", id);
+
+        var userToUpdate = await _userRepo.GetByIdAsync(id);
+
+        if (userToUpdate is null)
+        {
+            _logger.LogWarning("No user was found with ID: {ID}", id);
+
+            return Result<UserDto>.Fail("No user exists with that ID");
+        }
+
+        if (!string.IsNullOrWhiteSpace(updateDto.Email) && updateDto.Email != userToUpdate.Email)
+        {
+            var emailExists = await _userRepo.ExistsByEmailAsync(updateDto.Email, id);
+            if (emailExists) 
+            {
+                _logger.LogWarning("Update could not proceed. Email already taken.");
+                return Result<UserDto>.Fail("Email already taken."); 
+            }
+            userToUpdate.Email = updateDto.Email;
+        }
+
+        if (!string.IsNullOrWhiteSpace(updateDto.Username) && updateDto.Username != userToUpdate.Username)
+        {
+            var usernameExists = await _userRepo.ExistsByUsernameAsync(updateDto.Username, id);
+            if (usernameExists) 
+            {
+                _logger.LogWarning("Update could not proceed. Username already taken.");
+
+                return Result<UserDto>.Fail("Username already taken."); 
+            }
+
+            userToUpdate.Username = updateDto.Username;
+        }
+
+        var wasUpdated = await _userRepo.UpdateAsync(userToUpdate);
+        if (!wasUpdated)
+        {
+            _logger.LogWarning("Update did not complete successfully.");
+
+            return Result<UserDto>.Fail("Update operation failed.");
+        }
+
+        _logger.LogInformation("Update completed successfully for user with ID: {ID}", id);
+
+
+        return Result<UserDto>.Ok(userToUpdate.ToUserDto());
+    }
+
 
     public async Task<bool> DeleteByUserAsync(Guid id)
     {

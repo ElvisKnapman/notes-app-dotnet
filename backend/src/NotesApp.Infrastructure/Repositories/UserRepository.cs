@@ -34,17 +34,32 @@ public class UserRepository : IUserRepository
         return true;
     }
 
-    public async Task<bool> ExistsAsync(Guid id)
+    public async Task<bool> ExistsByIdAsync(Guid id)
     {
         return await _ctx.Users.AnyAsync(u => u.Id == id);
     }
 
-    public async Task<bool> ExistsAsync(string email)     
+    public async Task<bool> ExistsByEmailAsync(string email)     
     {
         return await _ctx.Users.AnyAsync(u => u.Email == email);
     }
 
-    public async Task<bool> ExistsAsync(string email, string username)
+    public async Task<bool> ExistsByEmailAsync(string email, Guid id)
+    {
+        return await _ctx.Users.AnyAsync(u => u.Email == email && u.Id != id);
+    }
+
+    public async Task<bool> ExistsByUsernameAsync(string username)
+    {
+        return await _ctx.Users.AnyAsync(u => u.Username == username);
+    }
+
+    public async Task<bool> ExistsByUsernameAsync(string username, Guid id)
+    {
+        return await _ctx.Users.AnyAsync(u => u.Username == username && u.Id != id);
+    }
+
+    public async Task<bool> ExistsByEmailAndUsernameAsync(string email, string username)
     {
         return await _ctx.Users.AnyAsync(u => u.Email == email || u.Username == username);
     }
@@ -74,13 +89,17 @@ public class UserRepository : IUserRepository
         return await _ctx.Users.AsNoTracking().FirstOrDefaultAsync(u => u.Id == id);
     }
 
-    public async Task UpdateAsync(User user)
+    public async Task<bool> SaveChangesAsync()
     {
-        throw new NotImplementedException();
-        //_ctx.Users.Upd
-        //var index = _users.FindIndex(u => u.Id == user.Id);
+        var affectedRows = await _ctx.SaveChangesAsync();
 
-        //_users.RemoveAt(index);
-        //_users.Add(user);
+        return affectedRows > 0;
+    }
+
+    public async Task<bool> UpdateAsync(User user)
+    {
+        var result = _ctx.Users.Update(user);
+
+        return await _ctx.SaveChangesAsync() > 0;
     }
 }
