@@ -1,4 +1,5 @@
 ﻿using NotesApp.Application.DTOs;
+using NotesApp.Domain.Common;
 using NotesApp.Domain.Entities;
 
 namespace NotesApp.Application.Interfaces;
@@ -10,7 +11,7 @@ public interface IUserService
     Task<IEnumerable<UserDto>> GetAllUsersAsync();
     Task<bool> DeleteByUserAsync(Guid id);
     Task UpdateUserAsync(User user);
-    Task<UserDto> AddUserAsync(CreateUserDto userDto);
+    Task<Result<UserDto>> AddUserAsync(CreateUserDto userDto);
     Task<string> HashPassword(string password);
     Task<bool> VerifyPassword(string password, string hashedPassword);
 }

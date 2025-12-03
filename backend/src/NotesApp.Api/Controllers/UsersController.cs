@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using NotesApp.Application.DTOs;
 using NotesApp.Application.Interfaces;
+using NotesApp.Domain.Common;
 
 namespace NotesApp.Api.Controllers;
 
@@ -39,9 +40,14 @@ public class UsersController : ControllerBase
     [HttpPost]
     public async Task<ActionResult<UserDto>> CreateUser(CreateUserDto userToCreate)
     {
-        UserDto userDto = await _userService.AddUserAsync(userToCreate);
+        Result<UserDto> result = await _userService.AddUserAsync(userToCreate);
 
-        return CreatedAtAction(nameof(GetById), new { Id = userDto.Id }, userDto);
+        if (!result.Success)
+        {
+            return BadRequest(result.Error);
+        }
+
+        return CreatedAtAction(nameof(GetById), new { Id = result?.Value?.Id }, result?.Value);
     }
 
     [HttpPost("hash-password")]

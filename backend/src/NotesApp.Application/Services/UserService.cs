@@ -1,6 +1,8 @@
-﻿using NotesApp.Application.DTOs;
+﻿using Microsoft.Extensions.Logging;
+using NotesApp.Application.DTOs;
 using NotesApp.Application.Interfaces;
 using NotesApp.Application.Mappers;
+using NotesApp.Domain.Common;
 using NotesApp.Domain.Entities;
 
 namespace NotesApp.Application.Services;
@@ -9,17 +11,50 @@ public class UserService : IUserService
 {
     private readonly IUserRepository _userRepo;
     private readonly IPasswordHasher _passwordHasher;
+    private readonly ILogger<UserService> _logger;
 
-    public UserService(IUserRepository userRepo, IPasswordHasher passwordHasher)
+    public UserService(IUserRepository userRepo, IPasswordHasher passwordHasher, ILogger<UserService> logger)
     {
         _userRepo = userRepo;
         _passwordHasher = passwordHasher;
+        _logger = logger;
     }
 
-    public async Task<UserDto> AddUserAsync(CreateUserDto userDto)
+    public async Task<Result<UserDto>> AddUserAsync(CreateUserDto userDto)
     {
-        var user = await _userRepo.AddAsync(userDto.ToUserEntity());
-        return userDto.ToUserDto();
+        _logger.LogInformation(
+            "Attempting to create new user with email: {Email} and username {Username}", 
+            userDto.Email, userDto.Username);
+
+        if (string.IsNullOrWhiteSpace(userDto.Email) || string.IsNullOrWhiteSpace(userDto.Username)) 
+        {
+            _logger.LogWarning("Couldn't create user, email and/or username is null or whitespace.");
+
+            return Result<UserDto>.Fail("Email can't be null, empty or all whitespace"); 
+        }
+
+        // Check if user with the same email already exists in DB
+        var userExists = await _userRepo.ExistsAsync(userDto.Email, userDto.Username);
+
+        if (userExists)
+        {
+            _logger.LogWarning(
+                "Couldn't create user. A user already exists with email: {Email} and/or username: {Username}", 
+                userDto.Email, userDto.Username);
+            
+            return Result<UserDto>.Fail("User with that email and/or username already exists");
+        }
+
+        var userToCreate = userDto.ToUserEntity();
+        userToCreate.PasswordHash = await HashPassword(userDto.Password!);
+
+        var createdUser = await _userRepo.AddAsync(userToCreate);
+
+        _logger.LogInformation(
+            "User successfully created with ID: {ID}",
+            createdUser.Id);
+
+        return Result<UserDto>.Ok(createdUser.ToUserDto());
     }
 
     public async Task<bool> DeleteByUserAsync(Guid id)

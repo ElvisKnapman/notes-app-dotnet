@@ -1,53 +1,86 @@
-﻿using NotesApp.Application.Interfaces;
+﻿using Microsoft.EntityFrameworkCore;
+using NotesApp.Application.Interfaces;
 using NotesApp.Domain.Entities;
+using NotesApp.Infrastructure.Persistence;
 
 namespace NotesApp.Infrastructure.Repositories;
 
 public class UserRepository : IUserRepository
 {
-    private static List<User> _users = [];
+    private readonly AppDbContext _ctx;
+
+    public UserRepository(AppDbContext context)
+    {
+        _ctx = context;
+    }
 
     public async Task<User> AddAsync(User user)
     {
-        _users.Add(user);
+        await _ctx.Users.AddAsync(user);
+        await _ctx.SaveChangesAsync();
+
         return user;
     }
 
     public async Task<bool> DeleteByIdAsync(Guid id)
     {
-        var user = _users.Find(u => u.Id == id);
+        var user = await _ctx.Users.FindAsync(id);
 
         if (user is null) return false;
 
-        _users.Remove(user);
+        _ctx.Users.Remove(user);
+        await _ctx.SaveChangesAsync();
+
         return true;
     }
 
     public async Task<bool> ExistsAsync(Guid id)
     {
-        return _users.Any(u => u.Id == id);
+        return await _ctx.Users.AnyAsync(u => u.Id == id);
     }
 
-    public async Task<List<User>> GetAllAsync()
+    public async Task<bool> ExistsAsync(string email)     
     {
-        return _users.ToList();
+        return await _ctx.Users.AnyAsync(u => u.Email == email);
+    }
+
+    public async Task<bool> ExistsAsync(string email, string username)
+    {
+        return await _ctx.Users.AnyAsync(u => u.Email == email || u.Username == username);
+    }
+
+    public async Task<IEnumerable<User>> GetAllAsync()
+    {
+        return await _ctx.Users.ToListAsync();
     }
 
     public async Task<User?> GetByEmailAsync(string email)
     {
-        return _users.Find(u => u.Email == email);
+        return await _ctx.Users.FirstOrDefaultAsync(u => u.Email == email);
+    }
+
+    public async Task<User?> GetByEmailNoTrackingAsync(string email)
+    {
+        return await _ctx.Users.AsNoTracking().FirstOrDefaultAsync(u => u.Email == email);
     }
 
     public async Task<User?> GetByIdAsync(Guid id)
     {
-        return _users.Find(u => u.Id == id);
+        return await _ctx.Users.FindAsync(id);
+    }
+
+    public async Task<User?> GetByIdNoTrackingAsync(Guid id)
+    {
+        return await _ctx.Users.AsNoTracking().FirstOrDefaultAsync(u => u.Id == id);
     }
 
     public async Task UpdateAsync(User user)
     {
-        var index = _users.FindIndex(u => u.Id == user.Id);
+        throw new NotImplementedException();
+        //_ctx.Users.Upd
+        //var index = _users.FindIndex(u => u.Id == user.Id);
 
-        _users.RemoveAt(index);
-        _users.Add(user);
+        //_users.RemoveAt(index);
+        //_users.Add(user);
     }
 }
