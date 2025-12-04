@@ -1,8 +1,9 @@
 ﻿using Microsoft.Extensions.Logging;
+using NotesApp.Application.Common;
+using NotesApp.Application.Common.Errors;
 using NotesApp.Application.DTOs;
 using NotesApp.Application.Interfaces;
 using NotesApp.Application.Mappers;
-using NotesApp.Domain.Common;
 using NotesApp.Domain.Entities;
 
 namespace NotesApp.Application.Services;
@@ -23,14 +24,14 @@ public class UserService : IUserService
     public async Task<Result<UserDto>> AddUserAsync(CreateUserDto userDto)
     {
         _logger.LogInformation(
-            "Attempting to create new user with email: {Email} and username {Username}", 
+            "Attempting to create new user with email: {Email} and username {Username}",
             userDto.Email, userDto.Username);
 
-        if (string.IsNullOrWhiteSpace(userDto.Email) || string.IsNullOrWhiteSpace(userDto.Username)) 
+        if (string.IsNullOrWhiteSpace(userDto.Email) || string.IsNullOrWhiteSpace(userDto.Username))
         {
             _logger.LogWarning("Couldn't create user, email and/or username is null or whitespace.");
 
-            return Result<UserDto>.Fail("Email can't be null, empty or all whitespace"); 
+            return Result<UserDto>.Fail(ErrorCodes.InvalidInput, ErrorMessages.InvalidInput);
         }
 
         // Check if user with the same email already exists in DB
@@ -39,10 +40,10 @@ public class UserService : IUserService
         if (userExists)
         {
             _logger.LogWarning(
-                "Couldn't create user. A user already exists with email: {Email} and/or username: {Username}", 
+                "Couldn't create user. A user already exists with email: {Email} and/or username: {Username}",
                 userDto.Email, userDto.Username);
-            
-            return Result<UserDto>.Fail("User with that email and/or username already exists");
+
+            return Result<UserDto>.Fail(ErrorCodes.EmailAndOrUsernameTaken, ErrorMessages.EmailAndOrUsernameTaken);
         }
 
         var userToCreate = userDto.ToUserEntity();
@@ -67,16 +68,16 @@ public class UserService : IUserService
         {
             _logger.LogWarning("No user was found with ID: {ID}", id);
 
-            return Result<UserDto>.Fail("No user exists with that ID");
+            return Result<UserDto>.Fail(ErrorCodes.UserNotFound, ErrorMessages.UserNotFoundWithID);
         }
 
         if (!string.IsNullOrWhiteSpace(updateDto.Email) && updateDto.Email != userToUpdate.Email)
         {
             var emailExists = await _userRepo.ExistsByEmailAsync(updateDto.Email, id);
-            if (emailExists) 
+            if (emailExists)
             {
                 _logger.LogWarning("Update could not proceed. Email already taken.");
-                return Result<UserDto>.Fail("Email already taken."); 
+                return Result<UserDto>.Fail(ErrorCodes.EmailExists, ErrorMessages.EmailTaken);
             }
             userToUpdate.Email = updateDto.Email;
         }
@@ -84,11 +85,11 @@ public class UserService : IUserService
         if (!string.IsNullOrWhiteSpace(updateDto.Username) && updateDto.Username != userToUpdate.Username)
         {
             var usernameExists = await _userRepo.ExistsByUsernameAsync(updateDto.Username, id);
-            if (usernameExists) 
+            if (usernameExists)
             {
                 _logger.LogWarning("Update could not proceed. Username already taken.");
 
-                return Result<UserDto>.Fail("Username already taken."); 
+                return Result<UserDto>.Fail(ErrorCodes.UsernameExists, ErrorMessages.UsernameTaken);
             }
 
             userToUpdate.Username = updateDto.Username;
@@ -99,7 +100,7 @@ public class UserService : IUserService
         {
             _logger.LogWarning("Update did not complete successfully.");
 
-            return Result<UserDto>.Fail("Update operation failed.");
+            return Result<UserDto>.Fail(ErrorCodes.UpdateFailed, ErrorMessages.UpdateFailed);
         }
 
         _logger.LogInformation("Update completed successfully for user with ID: {ID}", id);
