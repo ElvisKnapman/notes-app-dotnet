@@ -9,8 +9,6 @@ public interface IUserService
     Task<UserDto?> GetUserByEmailAsync(string email);
     Task<IEnumerable<UserDto>> GetAllUsersAsync();
     Task<bool> DeleteByUserAsync(Guid id);
-    Task<Result<UserDto>> AddUserAsync(CreateUserDto userDto);
+    //Task<Result<UserDto>> AddUserAsync(CreateUserDto userDto);
     Task<Result<UserDto>> UpdateUserAsync(Guid id, UpdateUserDto updateDto);
-    Task<string> HashPassword(string password);
-    Task<bool> VerifyPassword(string password, string hashedPassword);
 }

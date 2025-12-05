@@ -18,5 +18,5 @@ public interface IUserRepository
     Task<bool> ExistsByUsernameAsync(string username, Guid id);
     Task<bool> ExistsByEmailAndUsernameAsync(string email, string username);
     Task<bool> UpdateAsync(User user);
-    Task<bool> SaveChangesAsync();
+    Task<bool> SaveChangesAsync(CancellationToken cancellationToken);
 }

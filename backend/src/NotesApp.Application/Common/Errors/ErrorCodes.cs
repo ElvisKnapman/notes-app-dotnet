@@ -8,7 +8,7 @@ public static class ErrorCodes
     public const string InvalidInput = "common.invalid_input";
     public const string UsernameExists = "user.username_exists";
     public const string EmailExists = "user.email_exists";
-    public const string EmailAndOrUsernameTaken = "user.email_and_or_username_taken";
+    public const string EmailAndOrUsernameExists = "user.email_and_or_username_taken";
 
     public const string UpdateFailed = "user.update_failed";
     public const string CreationFailed = "user.creation_failed";

@@ -39,7 +39,7 @@ public class UserRepository : IUserRepository
         return await _ctx.Users.AnyAsync(u => u.Id == id);
     }
 
-    public async Task<bool> ExistsByEmailAsync(string email)     
+    public async Task<bool> ExistsByEmailAsync(string email)
     {
         return await _ctx.Users.AnyAsync(u => u.Email == email);
     }
@@ -89,17 +89,18 @@ public class UserRepository : IUserRepository
         return await _ctx.Users.AsNoTracking().FirstOrDefaultAsync(u => u.Id == id);
     }
 
-    public async Task<bool> SaveChangesAsync()
-    {
-        var affectedRows = await _ctx.SaveChangesAsync();
-
-        return affectedRows > 0;
-    }
-
     public async Task<bool> UpdateAsync(User user)
     {
         var result = _ctx.Users.Update(user);
 
         return await _ctx.SaveChangesAsync() > 0;
     }
+
+    public async Task<bool> SaveChangesAsync(CancellationToken cancellationToken)
+    {
+        var affectedRows = await _ctx.SaveChangesAsync();
+
+        return affectedRows > 0;
+    }
+
 }

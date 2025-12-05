@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using NotesApp.Application.Common;
 using NotesApp.Application.Common.Errors;
 using NotesApp.Application.DTOs;
 using NotesApp.Application.Interfaces;
@@ -38,24 +37,19 @@ public class UsersController : ControllerBase
         return Ok(user);
     }
 
-    [HttpPost]
-    public async Task<ActionResult<UserDto>> CreateUser(CreateUserDto userToCreate)
-    {
-        Result<UserDto> result = await _userService.AddUserAsync(userToCreate);
+    //[HttpPost]
+    //public async Task<ActionResult<UserDto>> CreateUser(CreateUserDto userToCreate)
+    //{
+    //    Result<UserDto> result = await _userService.AddUserAsync(userToCreate);
 
-        if (!result.Success)
-        {
-            return BadRequest(result.ErrorMessage);
-        }
+    //    if (!result.Success)
+    //    {
+    //        return BadRequest(result.ErrorMessage);
+    //    }
 
-        return CreatedAtAction(nameof(GetById), new { Id = result?.Value?.Id }, result?.Value);
-    }
+    //    return CreatedAtAction(nameof(GetById), new { Id = result?.Value?.Id }, result?.Value);
+    //}
 
-    [HttpPost("hash-password")]
-    public async Task<ActionResult<string>> HashPassword([FromBody] string password)
-    {
-        return Ok(await _userService.HashPassword(password));
-    }
 
     [HttpPut("{id:guid}")]
     public async Task<ActionResult> UpdateUser(Guid id, [FromBody] UpdateUserDto updateDto)

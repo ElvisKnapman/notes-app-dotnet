@@ -1,22 +1,33 @@
+using FluentValidation;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using NotesApp.Api.Filters;
 using NotesApp.Application.Interfaces;
 using NotesApp.Application.Services;
+using NotesApp.Domain.Entities;
 using NotesApp.Infrastructure.Persistence;
 using NotesApp.Infrastructure.Repositories;
-using NotesApp.Infrastructure.Security;
+using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
-builder.Services.AddControllers();
+builder.Services.AddScoped<ValidationActionFilter>();
+
+builder.Services.AddControllers(options =>
+{
+    options.Filters.Add<ValidationActionFilter>();
+});
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
-builder.Services.AddScoped<IPasswordHasher, BCryptPasswordHasher>();
+builder.Services.AddTransient<IPasswordHasher<User>, PasswordHasher<User>>();
+
+builder.Services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
 
 builder.Services.AddDbContext<AppDbContext>(options =>
 {

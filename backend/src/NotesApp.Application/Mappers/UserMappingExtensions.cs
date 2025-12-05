@@ -8,9 +8,8 @@ public static class UserMappingExtensions
     public static UserDto ToUserDto(this User user)
     {
         return new(user.Id, user.Username, user.Email, user.CreatedAt, user.UpdatedAt);
-        
-    }
 
+    }
 
     public static User ToUserEntity(this CreateUserDto userDto)
     {

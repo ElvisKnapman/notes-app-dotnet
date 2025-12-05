@@ -9,12 +9,13 @@ public static class ErrorMessages
     public const string NoteNotFoundWithID = "No note exists with that ID.";
 
     public const string InvalidInput = "The provided input is invalid.";
+    public const string InvalidPasswordInput = "The provided password is invalid.";
     public const string InvalidEmailInput = "The provided email is invalid.";
     public const string InvalidUsernameInput = "The provided username is invalid.";
 
-    public const string EmailTaken = "Email is already taken.";
-    public const string UsernameTaken = "Username is already taken.";
-    public const string EmailAndOrUsernameTaken = "Email and/or username is already taken.";
+    public const string EmailExists = "Email is already taken.";
+    public const string UsernameExists = "Username is already taken.";
+    public const string EmailAndOrUsernameExists = "Email and/or username is already taken.";
 
     public const string CreationFailed = "Failed to create the resource.";
     public const string UpdateFailed = "Failed to update the resource.";
