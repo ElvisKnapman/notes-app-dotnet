@@ -10,11 +10,13 @@ namespace NotesApp.Application.Services;
 
 public class UserService : IUserService
 {
+    private readonly IUnitOfWork _uow;
     private readonly IUserRepository _userRepo;
     private readonly ILogger<UserService> _logger;
 
-    public UserService(IUserRepository userRepo, ILogger<UserService> logger)
+    public UserService(IUnitOfWork uow, IUserRepository userRepo, ILogger<UserService> logger)
     {
+        _uow = uow;
         _userRepo = userRepo;
         _logger = logger;
     }
@@ -56,11 +58,11 @@ public class UserService : IUserService
     //    return Result<UserDto>.Ok(createdUser.ToUserDto());
     //}
 
-    public async Task<Result<UserDto>> UpdateUserAsync(Guid id, UpdateUserDto updateDto)
+    public async Task<Result<UserDto>> UpdateUserAsync(Guid id, UpdateUserDto updateDto, CancellationToken cancellationToken = default)
     {
         _logger.LogInformation("Attempting to update user with ID: {ID}", id);
 
-        var userToUpdate = await _userRepo.GetByIdAsync(id);
+        var userToUpdate = await _userRepo.GetByIdAsync(id, cancellationToken);
 
         if (userToUpdate is null)
         {
@@ -71,7 +73,7 @@ public class UserService : IUserService
 
         if (!string.IsNullOrWhiteSpace(updateDto.Email) && updateDto.Email != userToUpdate.Email)
         {
-            var emailExists = await _userRepo.ExistsByEmailAsync(updateDto.Email, id);
+            var emailExists = await _userRepo.ExistsByEmailAsync(updateDto.Email, id, cancellationToken);
             if (emailExists)
             {
                 _logger.LogWarning("Update could not proceed. Email already taken.");
@@ -82,7 +84,7 @@ public class UserService : IUserService
 
         if (!string.IsNullOrWhiteSpace(updateDto.Username) && updateDto.Username != userToUpdate.Username)
         {
-            var usernameExists = await _userRepo.ExistsByUsernameAsync(updateDto.Username, id);
+            var usernameExists = await _userRepo.ExistsByUsernameAsync(updateDto.Username, id, cancellationToken);
             if (usernameExists)
             {
                 _logger.LogWarning("Update could not proceed. Username already taken.");
@@ -93,8 +95,9 @@ public class UserService : IUserService
             userToUpdate.Username = updateDto.Username;
         }
 
-        var wasUpdated = await _userRepo.UpdateAsync(userToUpdate);
-        if (!wasUpdated)
+        var changes = await _uow.SaveChangesAsync(cancellationToken);
+
+        if (changes < 1)
         {
             _logger.LogWarning("Update did not complete successfully.");
 
@@ -110,7 +113,7 @@ public class UserService : IUserService
 
     public async Task<bool> DeleteByUserAsync(Guid id)
     {
-        return await _userRepo.DeleteByIdAsync(id);
+        throw new NotImplementedException();
 
     }
 
