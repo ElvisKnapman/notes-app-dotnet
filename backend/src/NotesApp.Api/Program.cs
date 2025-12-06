@@ -1,13 +1,14 @@
 using FluentValidation;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using NotesApp.Api.Filters;
-using NotesApp.Application.Interfaces;
-using NotesApp.Application.Services;
-using NotesApp.Domain.Entities;
-using NotesApp.Infrastructure.Persistence;
-using NotesApp.Infrastructure.Repositories;
+using NotesApp.Application.Configuration;
+using NotesApp.Infrastructure.Configuration;
+using NotesApp.Infrastructure.Security;
 using System.Reflection;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -23,17 +24,41 @@ builder.Services.AddControllers(options =>
 builder.Services.AddOpenApi();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
-builder.Services.AddScoped<IUserService, UserService>();
-builder.Services.AddScoped<IUserRepository, UserRepository>();
-builder.Services.AddTransient<IPasswordHasher<User>, PasswordHasher<User>>();
+// Add Application layer services
+builder.Services.AddApplication();
+
+// Add Infrastructure layer services
+string connectionString = builder.Configuration.GetConnectionString("DBConnection") ??
+    throw new InvalidOperationException("No connection string found in config");
+builder.Services.AddInfrastructure(connectionString);
+
+builder.Services.Configure<JwtOptions>(builder.Configuration.GetSection("JwtSettings"));
+
+
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        var jwtOptions = builder.Configuration.GetSection("JwtSettings").Get<JwtOptions>();
+        var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtOptions?.SecretKey ?? ""));
+
+        options.TokenValidationParameters = new()
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+
+
+            ValidIssuer = jwtOptions?.Issuer,
+            ValidAudience = jwtOptions?.Audience,
+            IssuerSigningKey = securityKey,
+
+            // Strict JWT expiration time
+            ClockSkew = TimeSpan.Zero
+        };
+    });
 
 builder.Services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
-
-builder.Services.AddDbContext<AppDbContext>(options =>
-{
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DBConnection"));
-});
 
 var app = builder.Build();
 
