@@ -18,5 +18,5 @@ public interface IUserRepository
 
     void Add(User user);
     void Update(User user);
-    void Delete(Guid id);
+    void Delete(User user);
 }

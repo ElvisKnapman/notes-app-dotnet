@@ -4,7 +4,6 @@ using NotesApp.Application.Common.Errors;
 using NotesApp.Application.DTOs;
 using NotesApp.Application.Interfaces;
 using NotesApp.Application.Mappers;
-using NotesApp.Domain.Entities;
 
 namespace NotesApp.Application.Services;
 
@@ -111,34 +110,36 @@ public class UserService : IUserService
     }
 
 
-    public async Task<bool> DeleteByUserAsync(Guid id)
+    public async Task<Result<bool>> DeleteAsync(Guid id, CancellationToken cancellationToken = default)
     {
         throw new NotImplementedException();
 
     }
 
-    public async Task<IEnumerable<UserDto>> GetAllUsersAsync()
+    public async Task<Result<IEnumerable<UserDto>>> GetAllAsync(CancellationToken cancellationToken)
     {
-        var users = await _userRepo.GetAllAsync();
+        var users = await _userRepo.GetAllAsync(cancellationToken);
 
-        return users.Select(user => user.ToUserDto());
+        return Result<IEnumerable<UserDto>>.Ok(users.Select(user => user.ToUserDto()));
     }
 
-    public async Task<UserDto?> GetUserByEmailAsync(string email)
+    public async Task<Result<UserDto>> GetByEmailAsync(string email, CancellationToken cancellationToken)
     {
-        var user = await _userRepo.GetByEmailAsync(email);
+        //var user = await _userRepo.GetByEmailAsync(email, cancellationToken);
 
-        return user?.ToUserDto();
+        //return user?.ToUserDto();
+        throw new NotImplementedException();
     }
 
-    public async Task<UserDto?> GetUserByIdAsync(Guid id)
+    public async Task<Result<UserDto>> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
     {
-        var user = await _userRepo.GetByIdAsync(id);
+        //var user = await _userRepo.GetByIdAsync(id, cancellationToken);
 
-        return user?.ToUserDto();
+        //return user?.ToUserDto();
+        throw new NotImplementedException();
     }
 
-    public async Task UpdateUserAsync(User user)
+    public async Task<Result<UserDto>> UpdateAsync(UpdateUserDto updatedUser, CancellationToken cancellationToken = default)
     {
         throw new NotImplementedException();
     }

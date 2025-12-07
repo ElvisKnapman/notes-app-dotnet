@@ -4,5 +4,5 @@ namespace NotesApp.Application.Interfaces;
 
 public interface ITokenService
 {
-    string GenerateToken(LoginUserDto dto);
+    string GenerateToken(UserDto dto);
 }

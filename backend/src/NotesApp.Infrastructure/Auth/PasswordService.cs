@@ -18,8 +18,8 @@ public class PasswordService : IPasswordService
         return _passwordHasher.HashPassword(user, password);
     }
 
-    public bool VerifyPassword(User user, string password, string hashedPassword)
+    public bool VerifyPassword(User user, string hash, string password)
     {
-        throw new NotImplementedException();
+        return _passwordHasher.VerifyHashedPassword(user, hash, password) == PasswordVerificationResult.Success;
     }
 }

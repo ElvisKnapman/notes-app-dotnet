@@ -14,93 +14,76 @@ public class UserRepository : IUserRepository
         _ctx = context;
     }
 
-    public async Task<User> AddAsync(User user)
+    public void Add(User user)
     {
-        await _ctx.Users.AddAsync(user);
-        await _ctx.SaveChangesAsync();
-
-        return user;
+        _ctx.Users.Add(user);
     }
 
-    public async Task<bool> DeleteByIdAsync(Guid id)
+    public void Update(User user)
     {
-        var user = await _ctx.Users.FindAsync(id);
+        _ctx.Users.Update(user);
+    }
 
-        if (user is null) return false;
-
+    public void Delete(User user)
+    {
         _ctx.Users.Remove(user);
-        await _ctx.SaveChangesAsync();
-
-        return true;
     }
 
-    public async Task<bool> ExistsByIdAsync(Guid id)
+    public async Task<bool> ExistsByIdAsync(Guid id, CancellationToken cancellationToken = default)
     {
         return await _ctx.Users.AnyAsync(u => u.Id == id);
     }
 
-    public async Task<bool> ExistsByEmailAsync(string email)
+    public async Task<bool> ExistsByEmailAsync(string email, CancellationToken cancellationToken = default)
     {
         return await _ctx.Users.AnyAsync(u => u.Email == email);
     }
 
-    public async Task<bool> ExistsByEmailAsync(string email, Guid id)
+    public async Task<bool> ExistsByEmailAsync(
+        string email, Guid id, CancellationToken cancellationToken = default)
     {
         return await _ctx.Users.AnyAsync(u => u.Email == email && u.Id != id);
     }
 
-    public async Task<bool> ExistsByUsernameAsync(string username)
+    public async Task<bool> ExistsByUsernameAsync(string username, CancellationToken cancellationToken = default)
     {
         return await _ctx.Users.AnyAsync(u => u.Username == username);
     }
 
-    public async Task<bool> ExistsByUsernameAsync(string username, Guid id)
+    public async Task<bool> ExistsByUsernameAsync(
+        string username, Guid id, CancellationToken cancellationToken = default)
     {
         return await _ctx.Users.AnyAsync(u => u.Username == username && u.Id != id);
     }
 
-    public async Task<bool> ExistsByEmailAndUsernameAsync(string email, string username)
+    public async Task<bool> ExistsByEmailAndUsernameAsync(
+        string email, string username, CancellationToken cancellationToken = default)
     {
         return await _ctx.Users.AnyAsync(u => u.Email == email || u.Username == username);
     }
 
-    public async Task<IEnumerable<User>> GetAllAsync()
+    public async Task<IEnumerable<User>> GetAllAsync(CancellationToken cancellationToken = default)
     {
         return await _ctx.Users.ToListAsync();
     }
 
-    public async Task<User?> GetByEmailAsync(string email)
+    public async Task<User?> GetByEmailAsync(string email, CancellationToken cancellationToken = default)
     {
         return await _ctx.Users.FirstOrDefaultAsync(u => u.Email == email);
     }
 
-    public async Task<User?> GetByEmailNoTrackingAsync(string email)
+    public async Task<User?> GetByEmailNoTrackingAsync(string email, CancellationToken cancellationToken = default)
     {
         return await _ctx.Users.AsNoTracking().FirstOrDefaultAsync(u => u.Email == email);
     }
 
-    public async Task<User?> GetByIdAsync(Guid id)
+    public async Task<User?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
     {
         return await _ctx.Users.FindAsync(id);
     }
 
-    public async Task<User?> GetByIdNoTrackingAsync(Guid id)
+    public async Task<User?> GetByIdNoTrackingAsync(Guid id, CancellationToken cancellationToken = default)
     {
         return await _ctx.Users.AsNoTracking().FirstOrDefaultAsync(u => u.Id == id);
     }
-
-    public async Task<bool> UpdateAsync(User user)
-    {
-        var result = _ctx.Users.Update(user);
-
-        return await _ctx.SaveChangesAsync() > 0;
-    }
-
-    public async Task<bool> SaveChangesAsync(CancellationToken cancellationToken)
-    {
-        var affectedRows = await _ctx.SaveChangesAsync();
-
-        return affectedRows > 0;
-    }
-
 }

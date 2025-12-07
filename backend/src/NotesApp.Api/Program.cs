@@ -32,7 +32,7 @@ string connectionString = builder.Configuration.GetConnectionString("DBConnectio
     throw new InvalidOperationException("No connection string found in config");
 builder.Services.AddInfrastructure(connectionString);
 
-builder.Services.Configure<JwtOptions>(builder.Configuration.GetSection("JwtSettings"));
+builder.Services.Configure<JwtOptions>(builder.Configuration.GetSection(nameof(JwtOptions)));
 
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)

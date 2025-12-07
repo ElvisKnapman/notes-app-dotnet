@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using NotesApp.Application.Interfaces;
 using NotesApp.Domain.Entities;
+using NotesApp.Infrastructure.Auth;
 using NotesApp.Infrastructure.Persistence;
 using NotesApp.Infrastructure.Repositories;
 
@@ -20,6 +21,8 @@ public static class DependencyInjection
 
         services.AddScoped<IUnitOfWork, UnitOfWork>();
         services.AddScoped<IUserRepository, UserRepository>();
+        services.AddScoped<ITokenService, TokenService>();
+        services.AddTransient<IPasswordService, PasswordService>();
         services.AddTransient<IPasswordHasher<User>, PasswordHasher<User>>();
 
         return services;
