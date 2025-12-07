@@ -1,7 +1,3 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿namespace NotesApp.Application.DTOs;
 
-namespace NotesApp.Application.DTOs;
-
-public record CreateUserDto(string? Username, string? Email, string? Password);
+public record CreateUserDto(string Username, string Email, string Password);

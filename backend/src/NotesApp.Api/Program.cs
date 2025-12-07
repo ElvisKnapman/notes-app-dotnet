@@ -38,8 +38,13 @@ builder.Services.Configure<JwtOptions>(builder.Configuration.GetSection("JwtSett
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
-        var jwtOptions = builder.Configuration.GetSection("JwtSettings").Get<JwtOptions>();
-        var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtOptions?.SecretKey ?? ""));
+        var jwtOptions = builder.Configuration.GetSection(nameof(JwtOptions)).Get<JwtOptions>()
+    ?? throw new InvalidOperationException($"{nameof(JwtOptions)} section is missing");
+
+        if (string.IsNullOrWhiteSpace(jwtOptions.SecretKey))
+            throw new ArgumentException($"JWT {nameof(JwtOptions.SecretKey)} must be provided", nameof(jwtOptions.SecretKey));
+
+        var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtOptions.SecretKey));
 
         options.TokenValidationParameters = new()
         {
@@ -53,7 +58,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ValidAudience = jwtOptions?.Audience,
             IssuerSigningKey = securityKey,
 
-            // Strict JWT expiration time
+            // Strict JWT expiration time (no grace period from server)
             ClockSkew = TimeSpan.Zero
         };
     });
@@ -71,6 +76,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseAuthentication();
 
 app.UseAuthorization();
 
