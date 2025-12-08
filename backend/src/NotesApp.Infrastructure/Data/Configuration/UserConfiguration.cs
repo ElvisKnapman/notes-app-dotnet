@@ -13,18 +13,17 @@ internal class UserConfiguration : IEntityTypeConfiguration<User>
         builder.HasKey(u => u.Id);
 
         builder.Property(u => u.Id)
-            .IsRequired()
-            .ValueGeneratedNever();
+            .IsRequired();
 
         builder.Property(u => u.Email)
-            .HasMaxLength(200)
+            .HasMaxLength(250)
             .IsRequired();
 
         builder.HasIndex(u => u.Email)
             .IsUnique();
 
         builder.Property(u => u.Username)
-            .HasMaxLength(150)
+            .HasMaxLength(60)
             .IsRequired();
 
         builder.HasIndex(u => u.Username)
@@ -33,5 +32,10 @@ internal class UserConfiguration : IEntityTypeConfiguration<User>
         builder.Property(u => u.PasswordHash)
             .HasMaxLength(256)
             .IsRequired();
+
+        builder.HasMany(u => u.Notes)
+            .WithOne(n => n.User)
+            .HasForeignKey(n => n.UserId)
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }

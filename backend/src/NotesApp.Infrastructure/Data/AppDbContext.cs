@@ -9,7 +9,7 @@ public class AppDbContext : DbContext
     public AppDbContext(DbContextOptions options) : base(options) { }
 
     public DbSet<User> Users { get; set; }
-    //public DbSet<Note> Notes { get; set; }
+    public DbSet<Note> Notes { get; set; }
 
     public override async Task<int> SaveChangesAsync(
     CancellationToken cancellationToken = default)
