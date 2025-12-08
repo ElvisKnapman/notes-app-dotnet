@@ -15,8 +15,6 @@ internal class UserConfiguration : IEntityTypeConfiguration<User>
         builder.Property(u => u.Id)
             .IsRequired()
             .ValueGeneratedNever();
-            //.ValueGeneratedOnAdd()
-            //.HasDefaultValueSql("NEWID()");
 
         builder.Property(u => u.Email)
             .HasMaxLength(200)
@@ -33,9 +31,7 @@ internal class UserConfiguration : IEntityTypeConfiguration<User>
             .IsUnique();
 
         builder.Property(u => u.PasswordHash)
-            .HasMaxLength(72)
-            .IsUnicode(false) // Helps EF infer VARCHAR rather than NVARCHAR
+            .HasMaxLength(256)
             .IsRequired();
-
     }
 }
