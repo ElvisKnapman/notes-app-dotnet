@@ -4,10 +4,10 @@ using Microsoft.Extensions.DependencyInjection;
 using NotesApp.Application.Interfaces;
 using NotesApp.Domain.Entities;
 using NotesApp.Infrastructure.Auth;
-using NotesApp.Infrastructure.Persistence;
+using NotesApp.Infrastructure.Data;
 using NotesApp.Infrastructure.Repositories;
 
-namespace NotesApp.Infrastructure.Configuration;
+namespace NotesApp.Infrastructure.DI;
 
 public static class DependencyInjection
 {

@@ -1,8 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using NotesApp.Domain.Entities;
-using NotesApp.Infrastructure.Persistence.Configuration;
+using NotesApp.Infrastructure.Data.Configuration;
 
-namespace NotesApp.Infrastructure.Persistence;
+namespace NotesApp.Infrastructure.Data;
 
 public class AppDbContext : DbContext
 {

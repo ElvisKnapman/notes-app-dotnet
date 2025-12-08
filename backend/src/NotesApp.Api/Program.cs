@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using NotesApp.Api.Filters;
 using NotesApp.Application.Configuration;
-using NotesApp.Infrastructure.Configuration;
+using NotesApp.Infrastructure.DI;
 using NotesApp.Infrastructure.Security;
 using System.Reflection;
 using System.Text;

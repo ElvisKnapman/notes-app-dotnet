@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using NotesApp.Application.Interfaces;
 using NotesApp.Domain.Entities;
-using NotesApp.Infrastructure.Persistence;
+using NotesApp.Infrastructure.Data;
 
 namespace NotesApp.Infrastructure.Repositories;
 

@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using NotesApp.Domain.Entities;
 
-namespace NotesApp.Infrastructure.Persistence.Configuration;
+namespace NotesApp.Infrastructure.Data.Configuration;
 
 internal class UserConfiguration : IEntityTypeConfiguration<User>
 {

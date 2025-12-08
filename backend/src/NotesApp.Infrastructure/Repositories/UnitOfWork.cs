@@ -1,5 +1,5 @@
 ﻿using NotesApp.Application.Interfaces;
-using NotesApp.Infrastructure.Persistence;
+using NotesApp.Infrastructure.Data;
 
 namespace NotesApp.Infrastructure.Repositories;
 
