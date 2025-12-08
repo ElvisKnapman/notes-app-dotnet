@@ -64,9 +64,8 @@ namespace NotesApp.Infrastructure.Migrations
 
                     b.Property<string>("PasswordHash")
                         .IsRequired()
-                        .HasMaxLength(72)
-                        .IsUnicode(false)
-                        .HasColumnType("varchar(72)");
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
 
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("datetime2");

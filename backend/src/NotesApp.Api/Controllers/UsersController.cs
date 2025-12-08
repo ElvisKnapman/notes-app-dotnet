@@ -1,11 +1,12 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using NotesApp.Api.Constants;
 using NotesApp.Application.Common.Errors;
 using NotesApp.Application.DTOs;
 using NotesApp.Application.Interfaces;
 
 namespace NotesApp.Api.Controllers;
 
-[Route("api/users")]
+[Route(RouteNames.Users.Base)]
 [ApiController]
 public class UsersController : ControllerBase
 {
@@ -19,44 +20,30 @@ public class UsersController : ControllerBase
     [HttpGet]
     public async Task<ActionResult<IEnumerable<UserDto>>> GetUsers()
     {
-        IEnumerable<UserDto> users = await _userService.GetAllUsersAsync();
+        var result = await _userService.GetAllAsync();
 
-        return Ok(users);
+        return Ok(result.Value);
     }
 
-    [HttpGet("{id:guid}")]
+    [HttpGet(RouteNames.Users.GetById, Name = nameof(GetById))]
     public async Task<ActionResult<UserDto>> GetById(Guid id)
     {
-        var user = await _userService.GetUserByIdAsync(id);
+        var result = await _userService.GetByIdAsync(id);
 
-        if (user is null)
+        if (!result.Success)
         {
-            return NotFound();
+            return BadRequest(result.ErrorMessage);
         }
 
-        return Ok(user);
+        return Ok(result.Value);
     }
-
-    //[HttpPost]
-    //public async Task<ActionResult<UserDto>> CreateUser(CreateUserDto userToCreate)
-    //{
-    //    Result<UserDto> result = await _userService.AddUserAsync(userToCreate);
-
-    //    if (!result.Success)
-    //    {
-    //        return BadRequest(result.ErrorMessage);
-    //    }
-
-    //    return CreatedAtAction(nameof(GetById), new { Id = result?.Value?.Id }, result?.Value);
-    //}
-
 
     [HttpPut("{id:guid}")]
     public async Task<ActionResult> UpdateUser(Guid id, [FromBody] UpdateUserDto updateDto)
     {
 
         // Try to do the update
-        var result = await _userService.UpdateUserAsync(id, updateDto);
+        var result = await _userService.UpdateAsync(updateDto);
 
         // Check the result
         if (!result.Success)

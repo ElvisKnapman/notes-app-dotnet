@@ -20,43 +20,6 @@ public class UserService : IUserService
         _logger = logger;
     }
 
-    //public async Task<Result<UserDto>> AddUserAsync(CreateUserDto userDto)
-    //{
-    //    _logger.LogInformation(
-    //        "Attempting to create new user with email: {Email} and username {Username}",
-    //        userDto.Email, userDto.Username);
-
-    //    if (string.IsNullOrWhiteSpace(userDto.Email) || string.IsNullOrWhiteSpace(userDto.Username))
-    //    {
-    //        _logger.LogWarning("Couldn't create user, email and/or username is null or whitespace.");
-
-    //        return Result<UserDto>.Fail(ErrorCodes.InvalidInput, ErrorMessages.InvalidInput);
-    //    }
-
-    //    // Check if user with the same email already exists in DB
-    //    var userExists = await _userRepo.ExistsByEmailAndUsernameAsync(userDto.Email, userDto.Username);
-
-    //    if (userExists)
-    //    {
-    //        _logger.LogWarning(
-    //            "Couldn't create user. A user already exists with email: {Email} and/or username: {Username}",
-    //            userDto.Email, userDto.Username);
-
-    //        return Result<UserDto>.Fail(ErrorCodes.EmailAndOrUsernameExists, ErrorMessages.EmailAndOrUsernameExists);
-    //    }
-
-    //    var userToCreate = userDto.ToUserEntity();
-    //    userToCreate.PasswordHash = await HashPassword(userDto.Password!);
-
-    //    var createdUser = await _userRepo.AddAsync(userToCreate);
-
-    //    _logger.LogInformation(
-    //        "User successfully created with ID: {ID}",
-    //        createdUser.Id);
-
-    //    return Result<UserDto>.Ok(createdUser.ToUserDto());
-    //}
-
     public async Task<Result<UserDto>> UpdateUserAsync(Guid id, UpdateUserDto updateDto, CancellationToken cancellationToken = default)
     {
         _logger.LogInformation("Attempting to update user with ID: {ID}", id);
@@ -125,18 +88,38 @@ public class UserService : IUserService
 
     public async Task<Result<UserDto>> GetByEmailAsync(string email, CancellationToken cancellationToken)
     {
-        //var user = await _userRepo.GetByEmailAsync(email, cancellationToken);
+        _logger.LogInformation("Attempting to retrieve user with email: {Email}", email);
 
-        //return user?.ToUserDto();
-        throw new NotImplementedException();
+        var user = await _userRepo.GetByEmailAsync(email, cancellationToken);
+
+        if (user is null)
+        {
+            _logger.LogWarning("No user was found with email: {Email}", email);
+
+            return Result<UserDto>.Fail(ErrorCodes.UserNotFound, ErrorMessages.UserNotFoundWithEmail);
+        }
+
+        _logger.LogInformation("User successfully found with email: {Email}", email);
+
+        return Result<UserDto>.Ok(user.ToUserDto());
     }
 
     public async Task<Result<UserDto>> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
     {
-        //var user = await _userRepo.GetByIdAsync(id, cancellationToken);
+        _logger.LogInformation("Attempting to retrieve user with ID: {ID}", id);
 
-        //return user?.ToUserDto();
-        throw new NotImplementedException();
+        var user = await _userRepo.GetByIdAsync(id, cancellationToken);
+
+        if (user is null)
+        {
+            _logger.LogWarning("No user was found with ID: {ID}", id);
+
+            return Result<UserDto>.Fail(ErrorCodes.UserNotFound, ErrorMessages.UserNotFoundWithID);
+        }
+
+        _logger.LogInformation("User successfully found with ID: {ID}", id);
+
+        return Result<UserDto>.Ok(user.ToUserDto());
     }
 
     public async Task<Result<UserDto>> UpdateAsync(UpdateUserDto updatedUser, CancellationToken cancellationToken = default)

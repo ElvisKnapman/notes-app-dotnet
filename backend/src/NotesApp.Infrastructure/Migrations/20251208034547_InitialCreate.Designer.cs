@@ -12,7 +12,7 @@ using NotesApp.Infrastructure.Persistence;
 namespace NotesApp.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20251203000551_InitialCreate")]
+    [Migration("20251208034547_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -67,9 +67,8 @@ namespace NotesApp.Infrastructure.Migrations
 
                     b.Property<string>("PasswordHash")
                         .IsRequired()
-                        .HasMaxLength(72)
-                        .IsUnicode(false)
-                        .HasColumnType("varchar(72)");
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
 
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("datetime2");
