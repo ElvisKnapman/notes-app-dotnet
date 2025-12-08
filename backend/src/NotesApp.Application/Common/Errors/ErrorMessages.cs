@@ -2,6 +2,7 @@
 
 public static class ErrorMessages
 {
+    public const string UserNotFound = "No user exists with the provided credentials.";
     public const string UserNotFoundWithID = "No user exists with that ID.";
     public const string UserNotFoundWithEmail = "No user exists with that email.";
     public const string UserNotFoundWithUsername = "No user exists with that username.";
