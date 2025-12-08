@@ -1,7 +1,7 @@
-﻿namespace NotesApp.Api.Validators;
+﻿using FluentValidation;
+using NotesApp.Application.DTOs;
 
-using FluentValidation;
-using NotesApp.Api.Controllers;
+namespace NotesApp.Api.Validators;
 
 public class LoginUserDtoValidator : AbstractValidator<LoginUserDto>
 {

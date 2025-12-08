@@ -87,7 +87,7 @@ public class AuthService : IAuthService
             return Result<UserDto>.Fail(ErrorCodes.UserNotFound, ErrorMessages.UserNotFound);
         }
 
-        _logger.LogInformation("User found, ID is: {ID}", user.Id);
+        _logger.LogInformation("User found with associated ID {ID}", user.Id);
 
         // Validate password
         var passwordsMatch = _passwordService.VerifyPassword(user, user.PasswordHash, dto.Password);
@@ -102,7 +102,7 @@ public class AuthService : IAuthService
         }
 
         _logger.LogInformation(
-            "Password successfully verified. User with ID: {ID} passed authentication", user.Id
+            "Password verified. User with ID: {ID} successfully authenticated", user.Id
             );
 
         return Result<UserDto>.Ok(user.ToUserDto());
