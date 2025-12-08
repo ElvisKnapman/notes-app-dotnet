@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using NotesApp.Application.Common;
 using NotesApp.Application.Common.Errors;
-using NotesApp.Application.DTOs;
+using NotesApp.Application.DTOs.Users;
 using NotesApp.Application.Interfaces;
 using NotesApp.Application.Mappers;
 

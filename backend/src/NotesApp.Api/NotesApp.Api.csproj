@@ -24,4 +24,9 @@
     <ProjectReference Include="..\NotesApp.Infrastructure\NotesApp.Infrastructure.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="DTOs\Requests\Notes\" />
+    <Folder Include="DTOs\Responses\" />
+  </ItemGroup>
+
 </Project>

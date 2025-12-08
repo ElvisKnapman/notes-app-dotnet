@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using NotesApp.Api.Constants;
 using NotesApp.Application.Common.Errors;
-using NotesApp.Application.DTOs;
+using NotesApp.Application.DTOs.Users;
 using NotesApp.Application.Interfaces;
 
 namespace NotesApp.Api.Controllers;

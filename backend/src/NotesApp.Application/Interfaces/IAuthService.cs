@@ -1,5 +1,5 @@
 ﻿using NotesApp.Application.Common;
-using NotesApp.Application.DTOs;
+using NotesApp.Application.DTOs.Users;
 
 namespace NotesApp.Application.Interfaces;
 

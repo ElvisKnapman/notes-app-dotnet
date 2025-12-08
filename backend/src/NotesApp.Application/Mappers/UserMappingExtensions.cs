@@ -1,4 +1,4 @@
-﻿using NotesApp.Application.DTOs;
+﻿using NotesApp.Application.DTOs.Users;
 using NotesApp.Domain.Entities;
 
 namespace NotesApp.Application.Mappers;

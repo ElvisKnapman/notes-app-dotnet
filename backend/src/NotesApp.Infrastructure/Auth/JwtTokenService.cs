@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
-using NotesApp.Application.DTOs;
+using NotesApp.Application.DTOs.Users;
 using NotesApp.Application.Interfaces;
 using NotesApp.Infrastructure.Security;
 using System.IdentityModel.Tokens.Jwt;
@@ -9,11 +9,11 @@ using System.Text;
 
 namespace NotesApp.Infrastructure.Auth;
 
-public class TokenService : ITokenService
+public class JwtTokenService : IJwtTokenService
 {
     private readonly JwtOptions _jwtOptions;
 
-    public TokenService(IOptions<JwtOptions> options)
+    public JwtTokenService(IOptions<JwtOptions> options)
     {
         _jwtOptions = options.Value;
     }

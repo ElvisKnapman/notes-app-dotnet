@@ -1,11 +1,11 @@
 ﻿using FluentValidation;
-using NotesApp.Application.DTOs;
+using NotesApp.Api.DTOs.Requests.Users;
 
 namespace NotesApp.Api.Validators;
 
-public class LoginUserDtoValidator : AbstractValidator<LoginUserDto>
+public class LoginUserRequestValidator : AbstractValidator<LoginUserRequest>
 {
-    public LoginUserDtoValidator()
+    public LoginUserRequestValidator()
     {
         RuleFor(x => x.Email)
             .NotEmpty().WithMessage("Email is required.")

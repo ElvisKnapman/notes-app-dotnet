@@ -1,11 +1,11 @@
 ﻿using FluentValidation;
-using NotesApp.Application.DTOs;
+using NotesApp.Api.DTOs.Requests.Users;
 
 namespace NotesApp.Api.Validators;
 
-public class CreateUserDtoValidator : AbstractValidator<CreateUserDto>
+public class CreateUserRequestValidator : AbstractValidator<CreateUserRequest>
 {
-    public CreateUserDtoValidator()
+    public CreateUserRequestValidator()
     {
         RuleFor(x => x.Username)
             .NotEmpty().WithMessage("Username is required.")

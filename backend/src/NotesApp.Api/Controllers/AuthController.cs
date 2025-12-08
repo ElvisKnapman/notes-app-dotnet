@@ -1,7 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using NotesApp.Api.Constants;
+using NotesApp.Api.DTOs.Requests.Users;
 using NotesApp.Application.Common.Errors;
-using NotesApp.Application.DTOs;
+using NotesApp.Application.DTOs.Users;
 using NotesApp.Application.Interfaces;
 
 namespace NotesApp.Api.Controllers;
@@ -11,18 +12,20 @@ namespace NotesApp.Api.Controllers;
 public class AuthController : ControllerBase
 {
     private readonly IAuthService _authService;
-    private readonly ITokenService _tokenService;
+    private readonly IJwtTokenService _tokenService;
 
-    public AuthController(IAuthService authService, ITokenService tokenService)
+    public AuthController(IAuthService authService, IJwtTokenService tokenService)
     {
         _authService = authService;
         _tokenService = tokenService;
     }
 
     [HttpPost(RouteNames.Auth.Register)]
-    public async Task<ActionResult> Register([FromBody] CreateUserDto dto, CancellationToken cancellationToken)
+    public async Task<ActionResult> Register([FromBody] CreateUserRequest request, CancellationToken cancellationToken)
     {
-        var result = await _authService.RegisterUserAsync(dto, cancellationToken);
+        var createUserDto = new CreateUserDto(request.Username, request.Email, request.Password);
+
+        var result = await _authService.RegisterUserAsync(createUserDto, cancellationToken);
 
         if (!result.Success)
         {
@@ -43,9 +46,11 @@ public class AuthController : ControllerBase
     }
 
     [HttpPost(RouteNames.Auth.Login)]
-    public async Task<ActionResult> Login([FromBody] LoginUserDto dto, CancellationToken cancellationToken)
+    public async Task<ActionResult> Login([FromBody] LoginUserRequest request, CancellationToken cancellationToken)
     {
-        var result = await _authService.LoginAsync(dto, cancellationToken);
+        var loginUserDto = new LoginUserDto(request.Email, request.Password);
+
+        var result = await _authService.LoginAsync(loginUserDto, cancellationToken);
 
         if (!result.Success)
         {
