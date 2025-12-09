@@ -20,7 +20,11 @@ public class UserService : IUserService
         _logger = logger;
     }
 
-    public async Task<Result<UserDto>> UpdateUserAsync(Guid id, UpdateUserDto updateDto, CancellationToken cancellationToken = default)
+
+    public async Task<Result<UserDto>> UpdateAsync(
+        Guid id, UpdateUserDto updateDto,
+        CancellationToken cancellationToken = default
+    )
     {
         _logger.LogInformation("Attempting to update user with ID: {ID}", id);
 
@@ -33,35 +37,54 @@ public class UserService : IUserService
             return Result<UserDto>.Fail(ErrorCodes.UserNotFound, ErrorMessages.UserNotFoundWithID);
         }
 
-        if (!string.IsNullOrWhiteSpace(updateDto.Email) && updateDto.Email != userToUpdate.Email)
+        // Verify there are actual changes to be made
+        if (
+            (string.IsNullOrWhiteSpace(updateDto.Email) ||
+             string.Equals(updateDto.Email, userToUpdate.Email, StringComparison.OrdinalIgnoreCase)) &&
+            (string.IsNullOrWhiteSpace(updateDto.Username) ||
+             string.Equals(updateDto.Username, userToUpdate.Username, StringComparison.OrdinalIgnoreCase))
+ )
         {
-            var emailExists = await _userRepo.ExistsByEmailAsync(updateDto.Email, id, cancellationToken);
+            _logger.LogInformation("No changes detected for user with ID: {ID}, updated canceled.", id);
+
+            return Result<UserDto>.Ok(userToUpdate.ToUserDto());
+        }
+
+        // Check for email uniqueness if it's being changed
+        if (!string.IsNullOrWhiteSpace(updateDto.Email))
+        {
+            var emailExists = await _userRepo.ExistsByEmailAsync(updateDto.Email, id, cancellationToken = default);
+
             if (emailExists)
             {
                 _logger.LogWarning("Update could not proceed. Email already taken.");
+
                 return Result<UserDto>.Fail(ErrorCodes.EmailExists, ErrorMessages.EmailExists);
             }
-            userToUpdate.Email = updateDto.Email;
         }
 
-        if (!string.IsNullOrWhiteSpace(updateDto.Username) && updateDto.Username != userToUpdate.Username)
+        // Check for username uniqueness if it's being changed
+        if (!string.IsNullOrWhiteSpace(updateDto.Username))
         {
             var usernameExists = await _userRepo.ExistsByUsernameAsync(updateDto.Username, id, cancellationToken);
+
             if (usernameExists)
             {
                 _logger.LogWarning("Update could not proceed. Username already taken.");
 
                 return Result<UserDto>.Fail(ErrorCodes.UsernameExists, ErrorMessages.UsernameExists);
             }
-
-            userToUpdate.Username = updateDto.Username;
         }
 
+        // Map updated value(s) to entity
+        userToUpdate.UpdateUserEntity(updateDto);
+
+        // User entity already tracked by EF Core (when retrieved), so just save tracked changes
         var changes = await _uow.SaveChangesAsync(cancellationToken);
 
         if (changes < 1)
         {
-            _logger.LogWarning("Update did not complete successfully.");
+            _logger.LogWarning("Update did not complete successfully while attempting to save.");
 
             return Result<UserDto>.Fail(ErrorCodes.UpdateFailed, ErrorMessages.UpdateFailed);
         }
@@ -79,14 +102,14 @@ public class UserService : IUserService
 
     }
 
-    public async Task<Result<IEnumerable<UserDto>>> GetAllAsync(CancellationToken cancellationToken)
+    public async Task<Result<IEnumerable<UserDto>>> GetAllAsync(CancellationToken cancellationToken = default)
     {
         var users = await _userRepo.GetAllAsync(cancellationToken);
 
         return Result<IEnumerable<UserDto>>.Ok(users.Select(user => user.ToUserDto()));
     }
 
-    public async Task<Result<UserDto>> GetByEmailAsync(string email, CancellationToken cancellationToken)
+    public async Task<Result<UserDto>> GetByEmailAsync(string email, CancellationToken cancellationToken = default)
     {
         _logger.LogInformation("Attempting to retrieve user with email: {Email}", email);
 
@@ -120,10 +143,5 @@ public class UserService : IUserService
         _logger.LogInformation("User successfully found with ID: {ID}", id);
 
         return Result<UserDto>.Ok(user.ToUserDto());
-    }
-
-    public async Task<Result<UserDto>> UpdateAsync(UpdateUserDto updatedUser, CancellationToken cancellationToken = default)
-    {
-        throw new NotImplementedException();
     }
 }

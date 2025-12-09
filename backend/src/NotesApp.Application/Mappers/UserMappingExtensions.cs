@@ -19,4 +19,17 @@ public static class UserMappingExtensions
             Email = userDto.Email ?? ""
         };
     }
+
+    public static User UpdateUserEntity(this User user, UpdateUserDto updateDto)
+    {
+        if (!string.IsNullOrWhiteSpace(updateDto.Username))
+        {
+            user.Username = updateDto.Username;
+        }
+        if (!string.IsNullOrWhiteSpace(updateDto.Email))
+        {
+            user.Email = updateDto.Email;
+        }
+        return user;
+    }
 }

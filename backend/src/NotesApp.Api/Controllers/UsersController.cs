@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using NotesApp.Api.Constants;
+using NotesApp.Api.DTOs.Requests.Users;
+using NotesApp.Api.DTOs.Responses;
 using NotesApp.Application.Common.Errors;
 using NotesApp.Application.DTOs.Users;
 using NotesApp.Application.Interfaces;
@@ -18,52 +20,51 @@ public class UsersController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<UserDto>>> GetUsers()
+    public async Task<ActionResult<IEnumerable<UserDto>>> GetUsers(CancellationToken cancellationToken = default)
     {
-        var result = await _userService.GetAllAsync();
+        var result = await _userService.GetAllAsync(cancellationToken);
 
-        return Ok(result.Value);
+        return Ok(new SuccessResponse<IEnumerable<UserDto>>(result.Value));
     }
 
     [HttpGet(RouteNames.Users.GetById, Name = nameof(GetById))]
-    public async Task<ActionResult<UserDto>> GetById(Guid id)
+    public async Task<ActionResult<UserDto>> GetById(Guid id, CancellationToken cancellationToken = default)
     {
-        var result = await _userService.GetByIdAsync(id);
+        var result = await _userService.GetByIdAsync(id, cancellationToken);
 
         if (!result.Success)
         {
-            return BadRequest(result.ErrorMessage);
+            return NotFound(new ErrorResponse(result.ErrorCode, result.ErrorMessage));
         }
 
-        return Ok(result.Value);
+        return Ok(new SuccessResponse<UserDto>(result.Value));
     }
 
-    [HttpPut("{id:guid}")]
-    public async Task<ActionResult> UpdateUser(Guid id, [FromBody] UpdateUserDto updateDto)
+    [HttpPut(RouteNames.Users.Update)]
+    public async Task<ActionResult> UpdateUser(
+        Guid id,
+        [FromBody] UpdateUserRequest updateRequest,
+        CancellationToken cancellationToken)
     {
 
-        // Try to do the update
-        var result = await _userService.UpdateAsync(updateDto);
+        var dto = new UpdateUserDto(updateRequest.Username, updateRequest.Email);
+
+        // Try the update
+        var result = await _userService.UpdateAsync(id, dto, cancellationToken);
 
         // Check the result
         if (!result.Success)
         {
-            var errorResponse = new
-            {
-                ErrorCode = result.ErrorCode,
-                ErrorMessage = result.ErrorMessage
-            };
-
             return result.ErrorCode switch
             {
-                ErrorCodes.UserNotFound => NotFound(errorResponse),
-                ErrorCodes.EmailExists => BadRequest(errorResponse),
-                ErrorCodes.UsernameExists => BadRequest(errorResponse),
-                ErrorCodes.UpdateFailed => BadRequest(errorResponse),
-                _ => BadRequest(errorResponse)
+                ErrorCodes.UserNotFound => NotFound(new ErrorResponse(result.ErrorCode, result.ErrorMessage)),
+                ErrorCodes.EmailExists or
+                ErrorCodes.UsernameExists or
+                ErrorCodes.UpdateFailed => BadRequest(new ErrorResponse(result.ErrorCode, result.ErrorMessage)),
+                _ => BadRequest(new ErrorResponse(result.ErrorCode, result.ErrorMessage))
             };
         }
 
-        return Ok(result.Value);
+        return Ok(new SuccessResponse<UserDto>(result.Value));
     }
 }

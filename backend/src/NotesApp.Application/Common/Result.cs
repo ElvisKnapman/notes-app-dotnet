@@ -4,10 +4,10 @@ public class Result<T>
 {
     public bool Success { get; }
     public T Value { get; }
-    public string? ErrorCode { get; }
-    public string? ErrorMessage { get; }
+    public string ErrorCode { get; }
+    public string ErrorMessage { get; }
 
-    private Result(bool success, T value, string? errorCode, string? errorMessage)
+    private Result(bool success, T value, string errorCode, string errorMessage)
     {
         Success = success;
         Value = value;
@@ -15,7 +15,7 @@ public class Result<T>
         ErrorMessage = errorMessage;
     }
 
-    public static Result<T> Ok(T value) => new(true, value, null, null);
+    public static Result<T> Ok(T value) => new(true, value, default!, default!);
     public static Result<T> Fail(string errorCode, string errorMessage)
         => new(false, default!, errorCode, errorMessage);
 }
