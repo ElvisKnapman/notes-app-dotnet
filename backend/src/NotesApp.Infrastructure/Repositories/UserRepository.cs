@@ -64,7 +64,7 @@ public class UserRepository : IUserRepository
 
     public async Task<IEnumerable<User>> GetAllAsync(CancellationToken cancellationToken = default)
     {
-        return await _ctx.Users.ToListAsync();
+        return await _ctx.Users.AsNoTracking().ToListAsync();
     }
 
     public async Task<User?> GetByEmailAsync(string email, CancellationToken cancellationToken = default)
