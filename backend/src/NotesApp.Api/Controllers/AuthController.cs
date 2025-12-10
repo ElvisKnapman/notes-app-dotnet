@@ -23,7 +23,7 @@ public class AuthController : ControllerBase
     }
 
     [HttpPost(RouteNames.Auth.Register)]
-    public async Task<ActionResult> Register([FromBody] CreateUserRequest request, CancellationToken cancellationToken = default)
+    public async Task<IActionResult> Register([FromBody] CreateUserRequest request, CancellationToken cancellationToken = default)
     {
         var createUserDto = new CreateUserDto(request.Username, request.Email, request.Password);
 
@@ -48,7 +48,7 @@ public class AuthController : ControllerBase
     }
 
     [HttpPost(RouteNames.Auth.Login)]
-    public async Task<ActionResult> Login([FromBody] LoginUserRequest request, CancellationToken cancellationToken = default)
+    public async Task<IActionResult> Login([FromBody] LoginUserRequest request, CancellationToken cancellationToken = default)
     {
         var loginUserDto = new LoginUserDto(request.Email, request.Password);
 

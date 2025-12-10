@@ -20,7 +20,7 @@ public class UsersController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<UserDto>>> GetUsers(CancellationToken cancellationToken = default)
+    public async Task<IActionResult> GetAll(CancellationToken cancellationToken = default)
     {
         var result = await _userService.GetAllAsync(cancellationToken);
 
@@ -28,7 +28,7 @@ public class UsersController : ControllerBase
     }
 
     [HttpGet(RouteNames.Users.GetById, Name = nameof(GetById))]
-    public async Task<ActionResult<UserDto>> GetById(Guid id, CancellationToken cancellationToken = default)
+    public async Task<IActionResult> GetById(Guid id, CancellationToken cancellationToken = default)
     {
         var result = await _userService.GetByIdAsync(id, cancellationToken);
 
@@ -41,7 +41,7 @@ public class UsersController : ControllerBase
     }
 
     [HttpPut(RouteNames.Users.Update)]
-    public async Task<ActionResult> UpdateUser(
+    public async Task<IActionResult> UpdateUser(
         Guid id,
         [FromBody] UpdateUserRequest updateRequest,
         CancellationToken cancellationToken)
