@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using NotesApp.Api.Constants;
+using NotesApp.Api.DTOs;
 using NotesApp.Api.DTOs.Requests.Users;
+using NotesApp.Api.DTOs.Responses;
 using NotesApp.Application.Common.Errors;
 using NotesApp.Application.DTOs.Users;
 using NotesApp.Application.Interfaces;
@@ -21,7 +23,7 @@ public class AuthController : ControllerBase
     }
 
     [HttpPost(RouteNames.Auth.Register)]
-    public async Task<ActionResult> Register([FromBody] CreateUserRequest request, CancellationToken cancellationToken)
+    public async Task<ActionResult> Register([FromBody] CreateUserRequest request, CancellationToken cancellationToken = default)
     {
         var createUserDto = new CreateUserDto(request.Username, request.Email, request.Password);
 
@@ -31,9 +33,9 @@ public class AuthController : ControllerBase
         {
             return result.ErrorCode switch
             {
-                ErrorCodes.EmailExists => BadRequest(ErrorMessages.EmailExists),
-                ErrorCodes.UsernameExists => BadRequest(ErrorMessages.UsernameExists),
-                ErrorCodes.CreationFailed => StatusCode(500, ErrorMessages.CreationFailed),
+                ErrorCodes.EmailExists => BadRequest(new ErrorResponse(result.ErrorCode, result.ErrorMessage)),
+                ErrorCodes.UsernameExists => BadRequest(new ErrorResponse(result.ErrorCode, result.ErrorMessage)),
+                ErrorCodes.CreationFailed => StatusCode(500, new ErrorResponse(result.ErrorCode, result.ErrorMessage)),
                 _ => BadRequest()
             };
         }
@@ -46,7 +48,7 @@ public class AuthController : ControllerBase
     }
 
     [HttpPost(RouteNames.Auth.Login)]
-    public async Task<ActionResult> Login([FromBody] LoginUserRequest request, CancellationToken cancellationToken)
+    public async Task<ActionResult> Login([FromBody] LoginUserRequest request, CancellationToken cancellationToken = default)
     {
         var loginUserDto = new LoginUserDto(request.Email, request.Password);
 
@@ -56,9 +58,9 @@ public class AuthController : ControllerBase
         {
             return result.ErrorCode switch
             {
-                ErrorCodes.UserNotFound => BadRequest(ErrorMessages.UserNotFound),
-                ErrorCodes.InvalidCredentials => Unauthorized(ErrorMessages.InvalidCredentials),
-                _ => StatusCode(500, "An unexpected error occurred.")
+                ErrorCodes.UserNotFound => BadRequest(new ErrorResponse(result.ErrorCode, result.ErrorMessage)),
+                ErrorCodes.InvalidCredentials => Unauthorized(new ErrorResponse(result.ErrorCode, result.ErrorMessage)),
+                _ => StatusCode(500, new ErrorResponse(result.ErrorCode, result.ErrorMessage))
             };
         }
 
@@ -66,6 +68,6 @@ public class AuthController : ControllerBase
 
         var token = _tokenService.GenerateToken(userDto);
 
-        return Ok(new { token });
+        return Ok(new SuccessResponse<JwtTokenDto>(new JwtTokenDto(token)));
     }
 }
