@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using NotesApp.Api.Filters;
 using NotesApp.Application.Configuration;
+using NotesApp.Infrastructure.Data;
 using NotesApp.Infrastructure.DI;
 using NotesApp.Infrastructure.Security;
 using System.Reflection;
@@ -66,6 +67,20 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 builder.Services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
 
 var app = builder.Build();
+
+// Seed the database
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
+
+    // Only seed in Development
+    if (app.Environment.IsDevelopment())
+    {
+        await db.Database.MigrateAsync();
+        await DbSeeder.SeedAsync(db, logger);
+    }
+}
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
