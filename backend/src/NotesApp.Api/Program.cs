@@ -3,7 +3,9 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using NotesApp.Api.Constants;
 using NotesApp.Api.Filters;
+using NotesApp.Api.Middleware;
 using NotesApp.Application.Configuration;
 using NotesApp.Infrastructure.Data;
 using NotesApp.Infrastructure.DI;
@@ -24,6 +26,22 @@ builder.Services.AddControllers(options =>
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 builder.Services.AddSwaggerGen();
+
+//builder.Services.ConfigureHttpJsonOptions(options =>
+//{
+//    options.SerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+//});
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(CorsPolicyNames.AllowAllPolicy, policy =>
+    {
+        policy.AllowAnyHeader();
+        policy.AllowAnyMethod();
+        policy.AllowCredentials();
+        policy.WithOrigins("http://localhost:4200");
+    });
+});
 
 // Add Application layer services
 builder.Services.AddApplication();
@@ -89,6 +107,12 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+app.UseCors(CorsPolicyNames.AllowAllPolicy);
+
+app.UseMiddleware<RequestTimingMiddleware>();
+
+app.UseMiddleware<ExceptionHandlingMiddleware>();
 
 app.UseHttpsRedirection();
 
