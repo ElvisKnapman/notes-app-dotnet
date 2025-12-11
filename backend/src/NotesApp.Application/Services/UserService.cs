@@ -95,7 +95,6 @@ public class UserService : IUserService
         return Result<UserDto>.Ok(userToUpdate.ToUserDto());
     }
 
-
     public async Task<Result<bool>> DeleteAsync(Guid id, CancellationToken cancellationToken = default)
     {
         throw new NotImplementedException();
@@ -131,7 +130,7 @@ public class UserService : IUserService
     {
         _logger.LogInformation("Attempting to retrieve user with ID: {ID}", id);
 
-        var user = await _userRepo.GetByIdAsync(id, cancellationToken);
+        var user = await _userRepo.GetByIdNoTrackingAsync(id, cancellationToken);
 
         if (user is null)
         {

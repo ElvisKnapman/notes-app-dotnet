@@ -6,7 +6,7 @@ using Microsoft.IdentityModel.Tokens;
 using NotesApp.Api.Constants;
 using NotesApp.Api.Filters;
 using NotesApp.Api.Middleware;
-using NotesApp.Application.Configuration;
+using NotesApp.Application.DI;
 using NotesApp.Infrastructure.Data;
 using NotesApp.Infrastructure.DI;
 using NotesApp.Infrastructure.Security;
@@ -53,7 +53,6 @@ builder.Services.AddInfrastructure(connectionString);
 
 builder.Services.Configure<JwtOptions>(builder.Configuration.GetSection(nameof(JwtOptions)));
 
-
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
@@ -73,8 +72,8 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ValidateIssuerSigningKey = true,
 
 
-            ValidIssuer = jwtOptions?.Issuer,
-            ValidAudience = jwtOptions?.Audience,
+            ValidIssuer = jwtOptions.Issuer,
+            ValidAudience = jwtOptions.Audience,
             IssuerSigningKey = securityKey,
 
             // Strict JWT expiration time (no grace period from server)
