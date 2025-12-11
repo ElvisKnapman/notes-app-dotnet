@@ -14,8 +14,4 @@
     <ProjectReference Include="..\NotesApp.Domain\NotesApp.Domain.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="DTOs\Notes\" />
-  </ItemGroup>
-
 </Project>
