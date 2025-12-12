@@ -6,6 +6,7 @@ using NotesApp.Api.DTOs.Responses;
 using NotesApp.Api.Extensions;
 using NotesApp.Application.Common.Constants;
 using NotesApp.Application.Common.Errors;
+using NotesApp.Application.DTOs.Common;
 using NotesApp.Application.DTOs.Notes;
 using NotesApp.Application.Interfaces;
 
@@ -13,6 +14,7 @@ namespace NotesApp.Api.Controllers;
 
 [ApiController]
 [Route(RouteNames.Notes.Base)]
+[Authorize]
 public class NotesController : ControllerBase
 {
     private readonly IAuthorizationService _authorizationService;
@@ -31,33 +33,33 @@ public class NotesController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetAll(
+    public async Task<IActionResult> GetMyNotes(
         [FromQuery] NoteQueryRequest request,
         CancellationToken cancellationToken = default
     )
     {
+        var userId = User.GetUserId();
+
         var noteQueryDto = new NoteQueryDto(
             request.PageSize,
-            request.PageCount,
+            request.PageNumber,
             request.SortBy,
             request.Descending,
             request.Search
         );
 
-        var users = await _noteService.GetAllAsync(cancellationToken);
+        var result = await _noteService.GetNotesForUserAsync(userId, noteQueryDto, cancellationToken);
 
-        return Ok(new SuccessResponse<IEnumerable<NoteDto>>(users.Value));
+        return Ok(new SuccessResponse<PagedResult<NoteDto>>(result.Value));
     }
 
     [HttpPost]
-    [Authorize]
     public async Task<IActionResult> CreateNote(
         [FromBody] CreateNoteRequest request,
         CancellationToken cancellationToken
     )
     {
-        var something = HttpContext;
-        // Call extension method to get GUID ID from JWT claims
+        // Call extension method to get GUID ID from authenticated JWT claims
         var userId = User.GetUserId();
 
         var createNoteDto = new CreateNoteDto(userId, request.Title, request.Content);
@@ -99,7 +101,6 @@ public class NotesController : ControllerBase
     }
 
     [HttpPut(RouteNames.Notes.Update)]
-    [Authorize]
     public async Task<IActionResult> UpdateNote(
         Guid id,
         [FromBody] UpdateNoteRequest request,
@@ -110,10 +111,10 @@ public class NotesController : ControllerBase
 
         if (note is null)
         {
-            return NotFound();
+            return NotFound(new ErrorResponse(ErrorCodes.NoteNotFound, ErrorMessages.NoteNotFoundWithID));
         }
 
-        // Authorization check
+        // Authorization checking if the user is the owner of the note
         var authorized = await _authorizationService.AuthorizeAsync(
             User,
             note,

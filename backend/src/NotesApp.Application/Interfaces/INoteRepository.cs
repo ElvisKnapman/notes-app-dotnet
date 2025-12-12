@@ -1,4 +1,6 @@
-﻿using NotesApp.Domain.Entities;
+﻿using NotesApp.Application.DTOs.Common;
+using NotesApp.Application.DTOs.Notes;
+using NotesApp.Domain.Entities;
 
 namespace NotesApp.Application.Interfaces;
 
@@ -9,6 +11,10 @@ public interface INoteRepository
     Task<Note?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default);
     Task<Note?> GetByIdNoTrackingAsync(Guid id, CancellationToken cancellationToken = default);
     Task<bool> ExistsByIdAsync(Guid id, CancellationToken cancellationToken = default);
+    Task<PagedResult<Note>> QueryUserNotesAsync(
+        Guid userId,
+        NoteQueryDto queryDto,
+        CancellationToken cancellationToken = default);
     bool HasChanges(Note note);
     void Add(Note note);
     void Update(Note updatedNote);

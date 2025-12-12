@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using NotesApp.Application.Common;
 using NotesApp.Application.Common.Errors;
+using NotesApp.Application.DTOs.Common;
 using NotesApp.Application.DTOs.Notes;
 using NotesApp.Application.Interfaces;
 using NotesApp.Application.Mappers;
@@ -26,6 +27,29 @@ public class NoteService : INoteService
         var notes = await _noteRepo.GetAllAsync(cancellationToken);
 
         return Result<IEnumerable<NoteDto>>.Ok(notes.Select(n => n.ToNoteDto()));
+    }
+
+    public async Task<Result<PagedResult<NoteDto>>> GetNotesForUserAsync(
+        Guid userId,
+        NoteQueryDto queryDto,
+        CancellationToken cancellationToken = default
+    )
+    {
+        _logger.LogInformation("Attempting to retrieve notes belonging to user with ID: {ID}", userId);
+
+        var pagedResult = await _noteRepo.QueryUserNotesAsync(userId, queryDto, cancellationToken);
+
+        var noteDtos = pagedResult.Items.Select(n => n.ToNoteDto()).ToList();
+
+        _logger.LogInformation("Retrieved notes belonging to user with ID: {ID}", userId);
+
+        return Result<PagedResult<NoteDto>>.Ok(new PagedResult<NoteDto>(
+          pagedResult.TotalCount,
+          pagedResult.PageNumber,
+          pagedResult.PageSize,
+          noteDtos
+        ));
+
     }
 
     public async Task<Result<NoteDto>> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
