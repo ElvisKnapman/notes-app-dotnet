@@ -4,6 +4,7 @@ using NotesApp.Application.Common.Errors;
 using NotesApp.Application.DTOs.Notes;
 using NotesApp.Application.Interfaces;
 using NotesApp.Application.Mappers;
+using NotesApp.Domain.Entities;
 
 namespace NotesApp.Application.Services;
 
@@ -74,36 +75,37 @@ public class NoteService : INoteService
     }
 
     public async Task<Result<NoteDto>> UpdateAsync(
+        Note note,
         UpdateNoteDto updateNoteDto,
         CancellationToken cancellationToken = default
     )
     {
         _logger.LogInformation("Attempting to update note with ID: {ID}", updateNoteDto.Id);
 
-        var noteEntity = await _noteRepo.GetByIdAsync(updateNoteDto.Id, cancellationToken);
-
-        if (noteEntity is null)
-        {
-            _logger.LogWarning("No  note was found with ID: {ID}", updateNoteDto.Id);
-
-            return Result<NoteDto>.Fail(ErrorCodes.NoteNotFound, ErrorMessages.NoteNotFoundWithID);
-        }
 
         // Map updated fields
-        noteEntity.UpdateNoteEntity(updateNoteDto);
+        note.UpdateNoteEntity(updateNoteDto);
 
-        // No need to add to change tracker as entity is already being tracked
-        var changes = await _uow.SaveChangesAsync(cancellationToken);
+        // Check that there are changes in the change tracker to save
+        var hasChanges = _noteRepo.HasChanges(note);
 
-        if (changes < 1)
+        if (!hasChanges)
         {
-            _logger.LogWarning("Note with ID: {ID} failed to update successfully.", noteEntity.Id);
+            _logger.LogInformation("No changes detected for note with ID: {ID}. Update skipped.", note.Id);
 
-            return Result<NoteDto>.Fail(ErrorCodes.UpdateFailed, ErrorMessages.UpdateFailed);
+            return Result<NoteDto>.Ok(note.ToNoteDto());
         }
 
-        _logger.LogInformation("Note with ID: {ID} updated successfully.", noteEntity.Id);
+        // No need to add to change tracker as entity is already being tracked
+        await _uow.SaveChangesAsync(cancellationToken);
 
-        return Result<NoteDto>.Ok(noteEntity.ToNoteDto());
+        _logger.LogInformation("Note with ID: {ID} updated successfully.", note.Id);
+
+        return Result<NoteDto>.Ok(note.ToNoteDto());
+    }
+
+    public async Task<Note?> GetEntityByIdAsync(Guid id, CancellationToken cancellationToken = default)
+    {
+        return await _noteRepo.GetByIdAsync(id, cancellationToken);
     }
 }

@@ -1,11 +1,15 @@
 using FluentValidation;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using NotesApp.Api.Constants;
 using NotesApp.Api.Filters;
 using NotesApp.Api.Middleware;
+using NotesApp.Application.Authorization.Handlers;
+using NotesApp.Application.Authorization.Requirements;
+using NotesApp.Application.Common.Constants;
 using NotesApp.Application.DI;
 using NotesApp.Infrastructure.Data;
 using NotesApp.Infrastructure.DI;
@@ -80,6 +84,16 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ClockSkew = TimeSpan.Zero
         };
     });
+
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy(AuthorizationPolicyNames.MustBeNoteOwner, policy =>
+        {
+            policy.Requirements.Add(new MustBeNoteOwnerRequirement());
+        });
+});
+
+builder.Services.AddSingleton<IAuthorizationHandler, MustBeNoteOwnerHandler>();
 
 builder.Services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
 

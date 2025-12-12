@@ -4,6 +4,7 @@ using NotesApp.Api.Constants;
 using NotesApp.Api.DTOs.Requests.Notes;
 using NotesApp.Api.DTOs.Responses;
 using NotesApp.Api.Extensions;
+using NotesApp.Application.Common.Constants;
 using NotesApp.Application.Common.Errors;
 using NotesApp.Application.DTOs.Notes;
 using NotesApp.Application.Interfaces;
@@ -14,11 +15,17 @@ namespace NotesApp.Api.Controllers;
 [Route(RouteNames.Notes.Base)]
 public class NotesController : ControllerBase
 {
+    private readonly IAuthorizationService _authorizationService;
     private readonly INoteService _noteService;
     private readonly ILogger<NotesController> _logger;
 
-    public NotesController(INoteService noteService, ILogger<NotesController> logger)
+    public NotesController(
+        INoteService noteService,
+        ILogger<NotesController> logger,
+        IAuthorizationService authorizationService
+    )
     {
+        _authorizationService = authorizationService;
         _noteService = noteService;
         _logger = logger;
     }
@@ -37,7 +44,7 @@ public class NotesController : ControllerBase
             request.Search
         );
 
-        var users = await _noteService.GetAllAsync(noteQueryDto, cancellationToken);
+        var users = await _noteService.GetAllAsync(cancellationToken);
 
         return Ok(new SuccessResponse<IEnumerable<NoteDto>>(users.Value));
     }
@@ -92,15 +99,32 @@ public class NotesController : ControllerBase
     }
 
     [HttpPut(RouteNames.Notes.Update)]
+    [Authorize]
     public async Task<IActionResult> UpdateNote(
         Guid id,
         [FromBody] UpdateNoteRequest request,
         CancellationToken cancellationToken
     )
     {
+        var note = await _noteService.GetEntityByIdAsync(id, cancellationToken);
+
+        if (note is null)
+        {
+            return NotFound();
+        }
+
+        // Authorization check
+        var authorized = await _authorizationService.AuthorizeAsync(
+            User,
+            note,
+            AuthorizationPolicyNames.MustBeNoteOwner
+        );
+
+        if (!authorized.Succeeded) return Forbid();
+
         var updateDto = new UpdateNoteDto(id, request.Title, request.Content);
 
-        var result = await _noteService.UpdateAsync(updateDto, cancellationToken);
+        var result = await _noteService.UpdateAsync(note, updateDto, cancellationToken);
 
         if (!result.Success)
         {

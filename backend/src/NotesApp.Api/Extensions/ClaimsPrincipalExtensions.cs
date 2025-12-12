@@ -1,4 +1,5 @@
-﻿using System.Security.Claims;
+﻿using NotesApp.Application.Common.Constants;
+using System.Security.Claims;
 
 namespace NotesApp.Api.Extensions;
 
@@ -8,7 +9,7 @@ public static class ClaimsPrincipalExtensions
     {
         ArgumentNullException.ThrowIfNull(user);
 
-        var userId = user.FindFirstValue(ClaimTypes.NameIdentifier)
+        var userId = user.FindFirstValue(ClaimNames.UserId)
             ?? throw new InvalidOperationException("User ID claim missing");
 
         if (!Guid.TryParse(userId, out Guid parsedId))

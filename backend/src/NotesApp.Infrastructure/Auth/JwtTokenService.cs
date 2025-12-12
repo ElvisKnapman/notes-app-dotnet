@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using NotesApp.Application.Common.Constants;
 using NotesApp.Application.DTOs.Users;
 using NotesApp.Application.Interfaces;
 using NotesApp.Infrastructure.Security;
@@ -23,9 +24,9 @@ public class JwtTokenService : IJwtTokenService
         // Do the claims
         var claims = new[]
         {
-            new Claim(JwtRegisteredClaimNames.Sub, dto.Id.ToString()),
-            new Claim(JwtRegisteredClaimNames.Email, dto.Email),
-            new Claim("username", dto.Username)
+            new Claim(ClaimNames.UserId, dto.Id.ToString()),
+            new Claim(ClaimNames.Email, dto.Email),
+            new Claim(ClaimNames.Username, dto.Username)
         };
 
         // Do the key
