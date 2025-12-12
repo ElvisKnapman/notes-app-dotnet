@@ -24,9 +24,20 @@ public class NotesController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetAll(CancellationToken cancellationToken = default)
+    public async Task<IActionResult> GetAll(
+        [FromQuery] NoteQueryRequest request,
+        CancellationToken cancellationToken = default
+    )
     {
-        var users = await _noteService.GetAllAsync(cancellationToken);
+        var noteQueryDto = new NoteQueryDto(
+            request.PageSize,
+            request.PageCount,
+            request.SortBy,
+            request.Descending,
+            request.Search
+        );
+
+        var users = await _noteService.GetAllAsync(noteQueryDto, cancellationToken);
 
         return Ok(new SuccessResponse<IEnumerable<NoteDto>>(users.Value));
     }
@@ -70,7 +81,7 @@ public class NotesController : ControllerBase
             return result.ErrorCode switch
             {
                 ErrorCodes.NoteNotFound =>
-                    BadRequest(new ErrorResponse(result.ErrorCode, result.ErrorMessage)),
+                    NotFound(new ErrorResponse(result.ErrorCode, result.ErrorMessage)),
                 _ => StatusCode(500, new ErrorResponse(result.ErrorCode, result.ErrorMessage))
             };
         }
@@ -78,5 +89,29 @@ public class NotesController : ControllerBase
         var noteDto = result.Value;
 
         return Ok(noteDto);
+    }
+
+    [HttpPut(RouteNames.Notes.Update)]
+    public async Task<IActionResult> UpdateNote(
+        Guid id,
+        [FromBody] UpdateNoteRequest request,
+        CancellationToken cancellationToken
+    )
+    {
+        var updateDto = new UpdateNoteDto(id, request.Title, request.Content);
+
+        var result = await _noteService.UpdateAsync(updateDto, cancellationToken);
+
+        if (!result.Success)
+        {
+            return result.ErrorCode switch
+            {
+                ErrorCodes.NoteNotFound => NotFound(new ErrorResponse(result.ErrorCode, result.ErrorMessage)),
+                ErrorCodes.UpdateFailed
+                or _ => StatusCode(500, new ErrorResponse(result.ErrorCode, result.ErrorMessage)),
+            };
+        }
+
+        return NoContent();
     }
 }

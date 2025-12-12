@@ -19,4 +19,19 @@ public static class NoteMappingExtensions
             UserId = createNoteDto.NoteOwnerId
         };
     }
+
+    public static Note UpdateNoteEntity(this Note note, UpdateNoteDto updateNoteDto)
+    {
+        if (!string.IsNullOrWhiteSpace(updateNoteDto.Title))
+        {
+            note.Title = updateNoteDto.Title;
+        }
+
+        if (!string.IsNullOrWhiteSpace(updateNoteDto.Content))
+        {
+            note.Content = updateNoteDto.Content;
+        }
+
+        return note;
+    }
 }

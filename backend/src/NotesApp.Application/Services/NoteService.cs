@@ -72,4 +72,38 @@ public class NoteService : INoteService
 
         return Result<NoteDto>.Ok(noteEntity.ToNoteDto());
     }
+
+    public async Task<Result<NoteDto>> UpdateAsync(
+        UpdateNoteDto updateNoteDto,
+        CancellationToken cancellationToken = default
+    )
+    {
+        _logger.LogInformation("Attempting to update note with ID: {ID}", updateNoteDto.Id);
+
+        var noteEntity = await _noteRepo.GetByIdAsync(updateNoteDto.Id, cancellationToken);
+
+        if (noteEntity is null)
+        {
+            _logger.LogWarning("No  note was found with ID: {ID}", updateNoteDto.Id);
+
+            return Result<NoteDto>.Fail(ErrorCodes.NoteNotFound, ErrorMessages.NoteNotFoundWithID);
+        }
+
+        // Map updated fields
+        noteEntity.UpdateNoteEntity(updateNoteDto);
+
+        // No need to add to change tracker as entity is already being tracked
+        var changes = await _uow.SaveChangesAsync(cancellationToken);
+
+        if (changes < 1)
+        {
+            _logger.LogWarning("Note with ID: {ID} failed to update successfully.", noteEntity.Id);
+
+            return Result<NoteDto>.Fail(ErrorCodes.UpdateFailed, ErrorMessages.UpdateFailed);
+        }
+
+        _logger.LogInformation("Note with ID: {ID} updated successfully.", noteEntity.Id);
+
+        return Result<NoteDto>.Ok(noteEntity.ToNoteDto());
+    }
 }

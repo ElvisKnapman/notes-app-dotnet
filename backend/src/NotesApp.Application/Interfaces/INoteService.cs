@@ -5,7 +5,8 @@ namespace NotesApp.Application.Interfaces;
 
 public interface INoteService
 {
-    Task<Result<NoteDto>> GetByIdAsync(Guid id, CancellationToken cancellationToken = default);
     Task<Result<IEnumerable<NoteDto>>> GetAllAsync(CancellationToken cancellationToken = default);
+    Task<Result<NoteDto>> GetByIdAsync(Guid id, CancellationToken cancellationToken = default);
+    Task<Result<NoteDto>> UpdateAsync(UpdateNoteDto updateDto, CancellationToken cancellationToken = default);
     Task<Result<NoteDto>> CreateAsync(CreateNoteDto createNoteDto, CancellationToken cancellationToken = default);
 }
