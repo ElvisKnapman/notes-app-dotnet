@@ -11,26 +11,35 @@ public class AppDbContext : DbContext
     public DbSet<User> Users { get; set; }
     public DbSet<Note> Notes { get; set; }
 
-    public override async Task<int> SaveChangesAsync(
-    CancellationToken cancellationToken = default)
+    public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
         var entries = ChangeTracker.Entries()
-            .Where(e => e.Entity is User &&
-                       (e.State == EntityState.Added || e.State == EntityState.Modified));
+            .Where(e => e.State == EntityState.Added || e.State == EntityState.Modified);
+
+        var now = DateTime.UtcNow;
 
         foreach (var entry in entries)
         {
-            var entity = (User)entry.Entity;
+            // Look for an UpdatedAt property on the entity, even if the type doesn't implement any interface
+            var updatedAtProp = entry.Entity.GetType().GetProperty("UpdatedAt");
 
-            if (entry.State == EntityState.Added)
+            if (updatedAtProp != null && updatedAtProp.PropertyType == typeof(DateTime))
             {
-                entity.CreatedAt = DateTime.UtcNow;
+                updatedAtProp.SetValue(entry.Entity, now);
             }
 
-            entity.UpdatedAt = DateTime.UtcNow;
+            // Also update CreatedAt if the entity has it and is Added
+            if (entry.State == EntityState.Added)
+            {
+                var createdAtProp = entry.Entity.GetType().GetProperty("CreatedAt");
+                if (createdAtProp != null && createdAtProp.PropertyType == typeof(DateTime))
+                {
+                    createdAtProp.SetValue(entry.Entity, now);
+                }
+            }
         }
 
-        return await base.SaveChangesAsync(cancellationToken);
+        return base.SaveChangesAsync(cancellationToken);
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
