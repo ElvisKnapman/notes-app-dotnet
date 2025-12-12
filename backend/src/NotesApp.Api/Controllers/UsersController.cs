@@ -65,6 +65,6 @@ public class UsersController : ControllerBase
             };
         }
 
-        return Ok(new SuccessResponse<UserDto>(result.Value));
+        return NoContent();
     }
 }
