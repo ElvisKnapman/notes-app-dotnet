@@ -20,7 +20,6 @@ public class UserService : IUserService
         _logger = logger;
     }
 
-
     public async Task<Result<UserDto>> UpdateAsync(
         Guid id, UpdateUserDto updateDto,
         CancellationToken cancellationToken = default

@@ -8,12 +8,12 @@ public static class RouteNames
         public const string Resource = "users";
         public const string Base = $"{ApiBase}/{Resource}";
 
-
         public const string GetById = "{id:guid}";
         public const string GetAll = $"";
         public const string Create = $"";
         public const string Update = "{id:guid}";
         public const string Delete = "{id:guid}";
+        public const string Me = "me";
     }
 
     public static class Notes

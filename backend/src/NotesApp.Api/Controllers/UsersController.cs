@@ -1,7 +1,9 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using NotesApp.Api.Constants;
 using NotesApp.Api.DTOs.Requests.Users;
 using NotesApp.Api.DTOs.Responses;
+using NotesApp.Api.Extensions;
 using NotesApp.Application.Common.Errors;
 using NotesApp.Application.DTOs.Users;
 using NotesApp.Application.Interfaces;
@@ -66,5 +68,21 @@ public class UsersController : ControllerBase
         }
 
         return NoContent();
+    }
+
+    [HttpGet(RouteNames.Users.Me)]
+    [Authorize]
+    public async Task<IActionResult> Me()
+    {
+        var userId = User.GetUserId();
+
+        var result = await _userService.GetByIdAsync(userId);
+
+        if (!result.Success)
+        {
+            return NotFound(new ErrorResponse(result.ErrorCode, result.ErrorMessage));
+        }
+
+        return Ok(new SuccessResponse<UserDto>(result.Value));
     }
 }
