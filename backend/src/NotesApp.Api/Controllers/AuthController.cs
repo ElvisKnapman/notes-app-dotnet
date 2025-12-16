@@ -58,7 +58,7 @@ public class AuthController : ControllerBase
         {
             return result.ErrorCode switch
             {
-                ErrorCodes.UserNotFound => BadRequest(new ErrorResponse(result.ErrorCode, result.ErrorMessage)),
+                ErrorCodes.UserNotFound => NotFound(new ErrorResponse(result.ErrorCode, result.ErrorMessage)),
                 ErrorCodes.InvalidCredentials => Unauthorized(new ErrorResponse(result.ErrorCode, result.ErrorMessage)),
                 _ => StatusCode(500, new ErrorResponse(result.ErrorCode, result.ErrorMessage))
             };
