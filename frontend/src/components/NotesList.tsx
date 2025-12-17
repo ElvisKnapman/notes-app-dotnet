@@ -7,10 +7,11 @@ interface NotesListProps {
 export default function NotesList({ notes }: NotesListProps) {
   return (
     <div>
-      <h2>Notes List</h2>
-      <div>
-        {notes.length > 0 ? `There are ${notes.length} notes.` : 'No notes.'}
-      </div>
+      <p>
+        {notes.length > 0
+          ? `There are ${notes.length} notes.`
+          : 'No notes to display. Add one!'}
+      </p>
     </div>
   );
 }
