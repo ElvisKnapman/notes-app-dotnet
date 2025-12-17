@@ -1,0 +1,29 @@
+header {
+  background-color: #e4e4e4;
+  padding: 1em;
+  margin-block-end: 2em;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+header h1 {
+  margin: 0;
+}
+
+.nav-links {
+  margin: 0;
+  padding: 0;
+  display: flex;
+  column-gap: 2rem;
+  list-style: none;
+}
+
+.nav-link {
+  display: block;
+  background-color: #39c;
+  padding: 0.7em 1.5em;
+  border-radius: 5px;
+  font-weight: bold;
+  color: #fff;
+}
