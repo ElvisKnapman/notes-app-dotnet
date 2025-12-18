@@ -15,15 +15,11 @@ header h1 {
   margin: 0;
   padding: 0;
   display: flex;
-  column-gap: 2rem;
+  column-gap: var(--spacing-current);
   list-style: none;
 }
 
 .nav-link {
-  display: block;
-  background-color: #39c;
-  padding: 0.7em 1.5em;
-  border-radius: 5px;
   font-weight: bold;
   color: #fff;
 }
