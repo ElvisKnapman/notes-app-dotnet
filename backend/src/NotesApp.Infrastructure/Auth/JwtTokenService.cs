@@ -10,7 +10,7 @@ using System.Text;
 
 namespace NotesApp.Infrastructure.Auth;
 
-public class JwtTokenService : IJwtTokenService
+public class JwtTokenService : ITokenService
 {
     private readonly JwtOptions _jwtOptions;
 

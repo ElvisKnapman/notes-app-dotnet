@@ -14,12 +14,14 @@ namespace NotesApp.Api.Controllers;
 public class AuthController : ControllerBase
 {
     private readonly IAuthService _authService;
-    private readonly IJwtTokenService _tokenService;
+    private readonly ITokenService _tokenService;
+    private readonly ITokenStore _tokenStore;
 
-    public AuthController(IAuthService authService, IJwtTokenService tokenService)
+    public AuthController(IAuthService authService, ITokenService tokenService, ITokenStore tokenStore)
     {
         _authService = authService;
         _tokenService = tokenService;
+        _tokenStore = tokenStore;
     }
 
     [HttpPost(RouteNames.Auth.Register)]
@@ -52,6 +54,8 @@ public class AuthController : ControllerBase
     {
         var loginUserDto = new LoginUserDto(request.Email, request.Password);
 
+        var context = HttpContext;
+
         var result = await _authService.LoginAsync(loginUserDto, cancellationToken);
 
         if (!result.Success)
@@ -67,6 +71,10 @@ public class AuthController : ControllerBase
         var userDto = result.Value;
 
         var token = _tokenService.GenerateToken(userDto);
+
+        // Add token to cookie on response
+        _tokenStore.Set(token);
+
 
         return Ok(new SuccessResponse<JwtTokenDto>(new JwtTokenDto(token)));
     }

@@ -2,7 +2,7 @@
 
 namespace NotesApp.Application.Interfaces;
 
-public interface IJwtTokenService
+public interface ITokenService
 {
     string GenerateToken(UserDto dto);
 }
