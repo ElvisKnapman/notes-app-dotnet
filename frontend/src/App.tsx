@@ -1,12 +1,14 @@
-import AppLayout from './layouts/AppLayout';
-import LoginPage from './pages/LoginPage';
+import { BrowserRouter } from 'react-router';
+import AppRoutes from './routes/AppRoutes';
+import { AuthProvider } from './context/AuthContext';
 // import NotesPage from './pages/NotesPage';
 
 export default function App() {
   return (
-    <AppLayout>
-      {/* <NotesPage /> */}
-      <LoginPage />
-    </AppLayout>
+    <BrowserRouter>
+      <AuthProvider>
+        <AppRoutes />
+      </AuthProvider>
+    </BrowserRouter>
   );
 }
