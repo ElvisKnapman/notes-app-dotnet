@@ -1,63 +1,31 @@
-import { getToken, setToken } from './tokenService';
-import { ApiError } from '../errors/ApiError';
 import { API_BASE_URL } from '../config/apiConfig';
 import type { AuthUser } from '../models/users/Users';
+import { http } from './http';
 
-interface TokenResponse {
+export interface LoginResponse {
   data: {
     token: string;
   };
   success: boolean;
 }
-export async function login(email: string, password: string): Promise<void> {
-  const response = await fetch(`${API_BASE_URL}/auth/login`, {
+
+export async function loginUser(
+  email: string,
+  password: string
+): Promise<LoginResponse> {
+  return await http<LoginResponse>(`${API_BASE_URL}/auth/login`, {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ email, password }),
   });
-
-  if (!response.ok) {
-    let message = 'Login failed';
-
-    if (response.status === 400) {
-      message = 'Invalid input send to api';
-    } else if (response.status === 401) {
-      message = 'Invalid credentials';
-    } else if (response.status === 404) {
-      message = 'No user registered user with that email';
-    }
-
-    throw new ApiError(response.status, message);
-  }
-
-  const json: TokenResponse = await response.json();
-  setToken(json.data.token);
 }
 
-interface UserDetailsResponse {
+interface UserDetailResponse {
   data: AuthUser;
   success: boolean;
 }
-
-export async function getMe(): Promise<UserDetailsResponse> {
-  const token = getToken();
-
-  if (token === null) {
-    throw new ApiError(0, 'No valid token available.');
-  }
-
-  const response = await fetch(`${API_BASE_URL}/users/me`, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
+export async function getMe(token: string): Promise<UserDetailResponse> {
+  return await http<UserDetailResponse>(`${API_BASE_URL}/users/me`, {
+    headers: { Authorization: `Bearer ${token}` },
   });
-
-  if (!response.ok) {
-    throw new ApiError(response.status, 'Failed to fetch user details.');
-  }
-
-  const data: UserDetailsResponse = await response.json();
-  return data;
 }
