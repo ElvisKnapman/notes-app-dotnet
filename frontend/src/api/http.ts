@@ -8,8 +8,13 @@ export async function http<T>(url: string, options?: RequestInit): Promise<T> {
     throw new ApiError(response.status, message);
   }
 
-  const data: T = await response.json();
-  return data;
+  const text = await response.text();
+
+  if (!text) {
+    return undefined as T;
+  }
+
+  return JSON.parse(text) as T;
 }
 
 function mapStatusToMessage(statusCode: number): string {
