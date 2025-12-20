@@ -35,5 +35,6 @@ public static class RouteNames
 
         public const string Register = "register";
         public const string Login = "login";
+        public const string Logout = "logout";
     }
 }

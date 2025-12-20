@@ -8,6 +8,7 @@ public static class ErrorMessages
     public const string UserNotFoundWithUsername = "No user exists with that username.";
 
     public const string NoteNotFoundWithID = "No note exists with that ID.";
+    public const string UserDoesNotOwnNote = "The user does not own the requested note.";
 
     public const string InvalidInput = "The provided input is invalid.";
     public const string InvalidPasswordInput = "The provided password is invalid.";
@@ -20,6 +21,7 @@ public static class ErrorMessages
 
     public const string CreationFailed = "Failed to create the resource.";
     public const string UpdateFailed = "Failed to update the resource.";
+    public const string DeletionFailed = "Failed to delete the resource.";
 
     public const string InvalidCredentials = "Invalid login credentials.";
     public const string UnauthorizedAccess = "You are not authorized to access this resource.";

@@ -78,4 +78,12 @@ public class AuthController : ControllerBase
 
         return Ok(new SuccessResponse<JwtTokenDto>(new JwtTokenDto(token)));
     }
+
+    [HttpPost(RouteNames.Auth.Logout)]
+    public async Task<IActionResult> Logout(CancellationToken cancellationToken = default)
+    {
+        // Remove the token cookie
+        _tokenStore.Clear();
+        return NoContent();
+    }
 }

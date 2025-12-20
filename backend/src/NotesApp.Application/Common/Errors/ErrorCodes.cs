@@ -10,8 +10,11 @@ public static class ErrorCodes
     public const string EmailExists = "user.email_already_exists";
     public const string EmailAndOrUsernameExists = "user.email_and_or_username_taken";
 
+    public const string UserDoesNotOwnNote = "note.user_does_not_own_note";
+
     public const string UpdateFailed = "common.update_failed";
     public const string CreationFailed = "common.creation_failed";
+    public const string DeletionFailed = "common.deletion_failed";
 
     public const string InvalidCredentials = "auth.invalid_credentials";
     public const string UnauthorizedAccess = "auth.unauthorized";
