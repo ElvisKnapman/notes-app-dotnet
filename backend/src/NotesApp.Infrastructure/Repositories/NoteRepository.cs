@@ -26,6 +26,11 @@ public class NoteRepository : INoteRepository
         _context.Update(updatedNote);
     }
 
+    public void Delete(Note note)
+    {
+        _context.Notes.Remove(note);
+    }
+
     public async Task<PagedResult<Note>> QueryUserNotesAsync(
         Guid userId,
         NoteQueryDto queryDto,
@@ -92,8 +97,10 @@ public class NoteRepository : INoteRepository
 
     public bool HasChanges(Note note)
     {
-        var properties = _context.Entry(note).Properties;
+        var entry = _context.Entry(note);
 
-        return _context.Entry(note).Properties.Any(p => p.IsModified);
+        return entry.State == EntityState.Modified
+            || entry.State == EntityState.Added
+            || entry.State == EntityState.Deleted;
     }
 }

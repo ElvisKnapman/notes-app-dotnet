@@ -1,31 +1,85 @@
-import { createContext, useState } from 'react';
+import { createContext, useEffect, useState } from 'react';
+import { getMe, loginUser, logoutUser } from '../api/authService';
+import type { AuthUser } from '../models/users/Users';
+import { ApiError } from '../errors/ApiError';
 
-interface AuthContextValue {
+export interface AuthContextValue {
+  user: AuthUser | null;
   isAuthenticated: boolean;
-  login: () => void;
+  isLoading: boolean;
+  errorMessage: string | null;
+  login: (email: string, password: string) => Promise<void>;
   logout: () => void;
 }
 
-const AuthContext = createContext<AuthContextValue | undefined>(undefined);
-
-export function AuthContextProvider({
-  children,
-}: {
+interface AuthContextProviderProps {
   children: React.ReactNode;
-}) {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+}
 
-  function login() {
-    setIsAuthenticated(true);
+export const AuthContext = createContext<AuthContextValue | undefined>(
+  undefined
+);
+
+export function AuthProvider({ children }: AuthContextProviderProps) {
+  const [user, setUser] = useState<AuthUser | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [attemptedLogin, setAttemptedLogin] = useState(false);
+
+  const isAuthenticated = user !== null;
+
+  useEffect(() => {
+    console.log('user state changed', user);
+  }, [user]);
+
+  async function login(email: string, password: string): Promise<void> {
+    setErrorMessage(null);
+    setIsLoading(true);
+
+    try {
+      const token = (await loginUser(email, password)).data.token;
+      const userDetails = await getMe(token);
+      setUser(userDetails.data);
+    } catch (error) {
+      if (error instanceof ApiError) {
+        setErrorMessage(error.message);
+      } else {
+        setErrorMessage('An unexpected error occurred.');
+      }
+    } finally {
+      setIsLoading(false);
+    }
   }
 
-  function logout() {
-    setIsAuthenticated(false);
+  async function logout(): Promise<void> {
+    console.log('called the dang logout function');
+    try {
+      await logoutUser();
+      console.log('this is before setting user to null');
+      setUser(null);
+      console.log('this is after setting user to null');
+    } catch (error) {
+      console.log('caught this error in the logout context function', error);
+      if (error instanceof ApiError) {
+        setErrorMessage(error.message);
+      } else {
+        setErrorMessage('An unexpected error occurred during logout.');
+      }
+    } finally {
+      console.log('finally ran');
+    }
   }
+
+  const contextValue = {
+    user,
+    isAuthenticated,
+    isLoading,
+    errorMessage,
+    login,
+    logout,
+  };
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, login, logout }}>
-      {children}
-    </AuthContext.Provider>
+    <AuthContext.Provider value={contextValue}>{children}</AuthContext.Provider>
   );
 }

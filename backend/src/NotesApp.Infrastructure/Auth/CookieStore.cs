@@ -21,6 +21,7 @@ public class CookieStore : ITokenStore
     {
         var cookieOptions = new CookieOptions
         {
+            Path = "/",
             HttpOnly = true,
             Secure = true,
             SameSite = SameSiteMode.None,
@@ -34,6 +35,7 @@ public class CookieStore : ITokenStore
     {
         var cookieOptions = new CookieOptions
         {
+            Path = "/",
             HttpOnly = true,
             Secure = true,
             SameSite = SameSiteMode.None,

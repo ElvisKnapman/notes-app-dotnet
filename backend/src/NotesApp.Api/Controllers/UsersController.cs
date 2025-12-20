@@ -12,6 +12,7 @@ namespace NotesApp.Api.Controllers;
 
 [Route(RouteNames.Users.Base)]
 [ApiController]
+[Authorize]
 public class UsersController : ControllerBase
 {
     private readonly IUserService _userService;
@@ -71,7 +72,6 @@ public class UsersController : ControllerBase
     }
 
     [HttpGet(RouteNames.Users.Me)]
-    [Authorize]
     public async Task<IActionResult> Me()
     {
         var userId = User.GetUserId();

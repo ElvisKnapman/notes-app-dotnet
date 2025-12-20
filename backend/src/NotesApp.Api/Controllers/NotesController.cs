@@ -4,7 +4,6 @@ using NotesApp.Api.Constants;
 using NotesApp.Api.DTOs.Requests.Notes;
 using NotesApp.Api.DTOs.Responses;
 using NotesApp.Api.Extensions;
-using NotesApp.Application.Common.Constants;
 using NotesApp.Application.Common.Errors;
 using NotesApp.Application.DTOs.Common;
 using NotesApp.Application.DTOs.Notes;
@@ -107,33 +106,42 @@ public class NotesController : ControllerBase
         CancellationToken cancellationToken
     )
     {
-        var note = await _noteService.GetEntityByIdAsync(id, cancellationToken);
-
-        if (note is null)
-        {
-            return NotFound(new ErrorResponse(ErrorCodes.NoteNotFound, ErrorMessages.NoteNotFoundWithID));
-        }
-
-        // Authorization checking if the user is the owner of the note
-        var authorized = await _authorizationService.AuthorizeAsync(
-            User,
-            note,
-            AuthorizationPolicyNames.MustBeNoteOwner
-        );
-
-        if (!authorized.Succeeded) return Forbid();
+        var userId = User.GetUserId();
 
         var updateDto = new UpdateNoteDto(id, request.Title, request.Content);
 
-        var result = await _noteService.UpdateAsync(note, updateDto, cancellationToken);
+        var result = await _noteService.UpdateAsync(updateDto, userId, cancellationToken);
 
         if (!result.Success)
         {
             return result.ErrorCode switch
             {
                 ErrorCodes.NoteNotFound => NotFound(new ErrorResponse(result.ErrorCode, result.ErrorMessage)),
-                ErrorCodes.UpdateFailed
-                or _ => StatusCode(500, new ErrorResponse(result.ErrorCode, result.ErrorMessage)),
+                ErrorCodes.UserDoesNotOwnNote =>
+                    Forbid(),
+                ErrorCodes.UpdateFailed or _ => StatusCode(500, new ErrorResponse(result.ErrorCode, result.ErrorMessage)),
+            };
+        }
+
+        return Ok(result.Value);
+    }
+
+    [HttpDelete(RouteNames.Notes.Delete)]
+    public async Task<IActionResult> DeleteNote(Guid id)
+    {
+        var userId = User.GetUserId();
+
+        var result = await _noteService.DeleteAsync(id, userId);
+
+        if (!result.Success)
+        {
+            return result.ErrorCode switch
+            {
+                ErrorCodes.NoteNotFound => NotFound(new ErrorResponse(result.ErrorCode, result.ErrorMessage)),
+                ErrorCodes.UserDoesNotOwnNote =>
+                    Forbid(),
+                ErrorCodes.DeletionFailed or _ => StatusCode(500, new ErrorResponse(result.ErrorCode, result.ErrorMessage)),
+
             };
         }
 
