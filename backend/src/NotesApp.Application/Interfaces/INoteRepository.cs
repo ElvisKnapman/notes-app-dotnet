@@ -18,4 +18,5 @@ public interface INoteRepository
     bool HasChanges(Note note);
     void Add(Note note);
     void Update(Note updatedNote);
+    void Delete(Note note);
 }

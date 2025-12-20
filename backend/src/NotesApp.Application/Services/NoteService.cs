@@ -52,20 +52,20 @@ public class NoteService : INoteService
 
     }
 
-    public async Task<Result<NoteDto>> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
+    public async Task<Result<NoteDto>> GetByIdAsync(Guid noteId, CancellationToken cancellationToken = default)
     {
-        _logger.LogInformation("Attempting to retrive note with ID: {ID}", id);
+        _logger.LogInformation("Attempting to retrive note with ID: {ID}", noteId);
 
-        var note = await _noteRepo.GetByIdNoTrackingAsync(id, cancellationToken);
+        var note = await _noteRepo.GetByIdNoTrackingAsync(noteId, cancellationToken);
 
         if (note is null)
         {
-            _logger.LogWarning("No note was found with ID: {ID}", id);
+            _logger.LogWarning("No note was found with ID: {ID}", noteId);
 
             return Result<NoteDto>.Fail(ErrorCodes.NoteNotFound, ErrorMessages.NoteNotFoundWithID);
         }
 
-        _logger.LogInformation("Successfully retrieved note with ID: {ID}", id);
+        _logger.LogInformation("Successfully retrieved note with ID: {ID}", noteId);
 
         return Result<NoteDto>.Ok(note.ToNoteDto());
     }
@@ -99,13 +99,29 @@ public class NoteService : INoteService
     }
 
     public async Task<Result<NoteDto>> UpdateAsync(
-        Note note,
         UpdateNoteDto updateNoteDto,
+        Guid userId,
         CancellationToken cancellationToken = default
     )
     {
         _logger.LogInformation("Attempting to update note with ID: {ID}", updateNoteDto.Id);
 
+        var note = await _noteRepo.GetByIdAsync(updateNoteDto.Id, cancellationToken);
+
+        if (note is null)
+        {
+            _logger.LogWarning("No Note was found with ID: {ID}. Update aborted.", updateNoteDto.Id);
+
+            return Result<NoteDto>.Fail(ErrorCodes.NoteNotFound, ErrorCodes.NoteNotFound);
+        }
+
+        if (note.UserId != userId)
+        {
+            _logger.LogWarning("User with user ID: {UserId} does not own note with ID: {NoteId}. Update aborted.",
+                userId, note.Id);
+
+            return Result<NoteDto>.Fail(ErrorCodes.UserDoesNotOwnNote, ErrorMessages.UserDoesNotOwnNote);
+        }
 
         // Map updated fields
         note.UpdateNoteEntity(updateNoteDto);
@@ -131,5 +147,44 @@ public class NoteService : INoteService
     public async Task<Note?> GetEntityByIdAsync(Guid id, CancellationToken cancellationToken = default)
     {
         return await _noteRepo.GetByIdAsync(id, cancellationToken);
+    }
+
+    public async Task<Result> DeleteAsync(Guid noteId, Guid userId)
+    {
+        _logger.LogInformation("Attempting to delete note with ID: {ID}", noteId);
+
+        var note = await _noteRepo.GetByIdAsync(noteId);
+
+        if (note is null)
+        {
+            _logger.LogWarning("No Note was found with ID: {ID}. Delete aborted.", noteId);
+
+            return Result.Fail(ErrorCodes.NoteNotFound, ErrorMessages.NoteNotFoundWithID);
+        }
+
+        if (note.UserId != userId)
+        {
+            _logger.LogWarning("User with user ID: {UserId} does not own note with ID: {NoteId}. Deletion aborted.",
+                userId, note.Id);
+
+            return Result.Fail(ErrorCodes.UserDoesNotOwnNote, ErrorMessages.UserDoesNotOwnNote);
+        }
+
+        _noteRepo.Delete(note);
+
+        var hasChanges = _noteRepo.HasChanges(note);
+
+        if (!hasChanges)
+        {
+            _logger.LogInformation("No changes detected. Delete was skipped.");
+
+            return Result.Fail(ErrorCodes.DeletionFailed, ErrorMessages.DeletionFailed);
+        }
+
+        await _uow.SaveChangesAsync();
+
+        _logger.LogInformation("Note with ID: {noteId} deleted successfully.", note.Id);
+
+        return Result.Ok();
     }
 }

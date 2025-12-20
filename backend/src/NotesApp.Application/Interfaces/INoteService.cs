@@ -13,13 +13,14 @@ public interface INoteService
         NoteQueryDto queryDto,
         CancellationToken cancellationToken = default);
 
-    Task<Result<NoteDto>> GetByIdAsync(Guid id, CancellationToken cancellationToken = default);
+    Task<Result<NoteDto>> GetByIdAsync(Guid noteId, CancellationToken cancellationToken = default);
     Task<Result<NoteDto>> UpdateAsync(
-        Note note,
         UpdateNoteDto updateDto,
+        Guid userId,
         CancellationToken cancellationToken = default
     );
 
     Task<Result<NoteDto>> CreateAsync(CreateNoteDto createNoteDto, CancellationToken cancellationToken = default);
-    Task<Note?> GetEntityByIdAsync(Guid id, CancellationToken cancellationToken = default);
+    Task<Note?> GetEntityByIdAsync(Guid noteId, CancellationToken cancellationToken = default);
+    Task<Result> DeleteAsync(Guid noteId, Guid userId, CancellationToken cancellationToken = default);
 }
