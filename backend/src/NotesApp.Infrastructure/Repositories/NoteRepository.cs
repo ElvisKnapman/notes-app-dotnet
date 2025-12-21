@@ -51,8 +51,8 @@ public class NoteRepository : INoteRepository
                     ? query.OrderByDescending(n => n.Title)
                     : query.OrderBy(n => n.Title),
                 "updatedAt" => queryDto.Descending
-                    ? query.OrderByDescending(n => n.CreatedAt)
-                    : query.OrderBy(n => n.CreatedAt),
+                    ? query.OrderByDescending(n => n.UpdatedAt)
+                    : query.OrderBy(n => n.UpdatedAt),
                 _ => queryDto.Descending
                     ? query.OrderByDescending(n => n.CreatedAt)
                     : query.OrderBy(n => n.CreatedAt),

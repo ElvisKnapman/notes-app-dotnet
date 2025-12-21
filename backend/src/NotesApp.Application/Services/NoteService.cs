@@ -149,7 +149,7 @@ public class NoteService : INoteService
         return await _noteRepo.GetByIdAsync(id, cancellationToken);
     }
 
-    public async Task<Result> DeleteAsync(Guid noteId, Guid userId)
+    public async Task<Result> DeleteAsync(Guid noteId, Guid userId, CancellationToken cancellationToken = default)
     {
         _logger.LogInformation("Attempting to delete note with ID: {ID}", noteId);
 
