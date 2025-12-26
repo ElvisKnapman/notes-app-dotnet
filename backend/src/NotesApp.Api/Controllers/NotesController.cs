@@ -76,7 +76,11 @@ public class NotesController : ControllerBase
 
         var createdNote = result.Value;
 
-        return CreatedAtAction(nameof(GetById), new { Id = createdNote.Id }, createdNote);
+        return CreatedAtAction(
+            nameof(GetById),
+            new { Id = createdNote.Id },
+            new SuccessResponse<NoteDto>(createdNote)
+        );
     }
 
     [HttpGet(RouteNames.Notes.GetById)]
@@ -94,9 +98,7 @@ public class NotesController : ControllerBase
             };
         }
 
-        var noteDto = result.Value;
-
-        return Ok(noteDto);
+        return Ok(new SuccessResponse<NoteDto>(result.Value));
     }
 
     [HttpPut(RouteNames.Notes.Update)]
@@ -123,7 +125,7 @@ public class NotesController : ControllerBase
             };
         }
 
-        return Ok(result.Value);
+        return Ok(new SuccessResponse<NoteDto>(result.Value));
     }
 
     [HttpDelete(RouteNames.Notes.Delete)]
