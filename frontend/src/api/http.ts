@@ -1,7 +1,13 @@
 import { ApiError } from '../errors/ApiError';
+import { authEvents } from './authEvents';
 
 export async function http<T>(url: string, options?: RequestInit): Promise<T> {
   const response = await fetch(url, { credentials: 'include', ...options });
+
+  // On unauthorized response status, notify subscribers
+  if (response.status === 401) {
+    authEvents.emitUnauthorized();
+  }
 
   if (!response.ok) {
     const message = mapStatusToMessage(response.status);

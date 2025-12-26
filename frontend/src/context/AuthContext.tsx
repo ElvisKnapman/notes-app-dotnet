@@ -2,10 +2,12 @@ import { createContext, useEffect, useState } from 'react';
 import { getMe, loginUser, logoutUser } from '../api/authService';
 import type { AuthUser } from '../models/users/Users';
 import { ApiError } from '../errors/ApiError';
+import { authEvents } from '../api/authEvents';
 
 export interface AuthContextValue {
   user: AuthUser | null;
   isAuthenticated: boolean;
+  authChecked: boolean;
   isLoading: boolean;
   errorMessage: string | null;
   login: (email: string, password: string) => Promise<void>;
@@ -24,21 +26,44 @@ export function AuthProvider({ children }: AuthContextProviderProps) {
   const [user, setUser] = useState<AuthUser | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [attemptedLogin, setAttemptedLogin] = useState(false);
+  const [authChecked, setAuthChecked] = useState(false);
 
   const isAuthenticated = user !== null;
 
   useEffect(() => {
-    console.log('user state changed', user);
-  }, [user]);
+    console.log('checking auth status on mount');
+    // try to fetch user details for authenticated users on mount
+    authCheck();
+  }, []);
+
+  useEffect(() => {
+    // subscribe to unauthorized events to set auth state for 401 responses during API calls
+    const unsubscribe = authEvents.onUnauthorized(() => {
+      console.log('handling unauthorized event in AuthContext');
+      setUser(null);
+    });
+
+    return unsubscribe;
+  }, []);
+
+  async function authCheck(): Promise<void> {
+    try {
+      const response = await getMe();
+      setUser(response.data);
+    } catch (error) {
+      setUser(null);
+    } finally {
+      setAuthChecked(true);
+    }
+  }
 
   async function login(email: string, password: string): Promise<void> {
     setErrorMessage(null);
     setIsLoading(true);
 
     try {
-      const token = (await loginUser(email, password)).data.token;
-      const userDetails = await getMe(token);
+      await loginUser(email, password);
+      const userDetails = await getMe();
       setUser(userDetails.data);
     } catch (error) {
       if (error instanceof ApiError) {
@@ -52,12 +77,9 @@ export function AuthProvider({ children }: AuthContextProviderProps) {
   }
 
   async function logout(): Promise<void> {
-    console.log('called the dang logout function');
     try {
       await logoutUser();
-      console.log('this is before setting user to null');
       setUser(null);
-      console.log('this is after setting user to null');
     } catch (error) {
       console.log('caught this error in the logout context function', error);
       if (error instanceof ApiError) {
@@ -65,14 +87,13 @@ export function AuthProvider({ children }: AuthContextProviderProps) {
       } else {
         setErrorMessage('An unexpected error occurred during logout.');
       }
-    } finally {
-      console.log('finally ran');
     }
   }
 
-  const contextValue = {
+  const contextValue: AuthContextValue = {
     user,
     isAuthenticated,
+    authChecked,
     isLoading,
     errorMessage,
     login,

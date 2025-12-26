@@ -20,12 +20,16 @@ export async function loginUser(
   });
 }
 
+export async function logoutUser(): Promise<void> {
+  return await http<void>(`${API_BASE_URL}/auth/logout`, {
+    method: 'POST',
+  });
+}
+
 interface UserDetailResponse {
   data: AuthUser;
   success: boolean;
 }
-export async function getMe(token: string): Promise<UserDetailResponse> {
-  return await http<UserDetailResponse>(`${API_BASE_URL}/users/me`, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
+export async function getMe(): Promise<UserDetailResponse> {
+  return await http<UserDetailResponse>(`${API_BASE_URL}/users/me`);
 }
