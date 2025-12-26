@@ -1,5 +1,17 @@
 :root {
   box-sizing: border-box;
+
+  --clr-primary: #000;
+  --clr-accent: #39c;
+
+  --spacing-xs: 0.25em;
+  --spacing-sm: 0.5em;
+  --spacing-reg: 0.75em;
+  --spacing-lg: 1em;
+  --spacing-xl: 1.5em;
+  --spacing-xxl: 2em;
+
+  --spacing-current: var(--spacing-reg);
 }
 
 body {
@@ -24,7 +36,20 @@ h6 {
   margin: 0;
 }
 
-.content-wrapper {
+.main-content-wrapper {
+  padding: var(--spacing-reg);
   max-width: 1280px;
   margin: 0 auto;
+}
+
+.btn {
+  display: inline-block;
+  padding: var(--spacing-reg) var(--spacing-xl);
+  background-color: var(--clr-primary);
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.btn-accent {
+  background-color: var(--clr-accent);
 }
