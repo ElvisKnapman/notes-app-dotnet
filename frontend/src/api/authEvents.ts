@@ -3,7 +3,7 @@ type UnauthorizedHandler = () => void;
 class AuthEvents {
   private unauthorizedHandlers = new Set<UnauthorizedHandler>();
 
-  onAuthorized(handler: UnauthorizedHandler): () => void {
+  onUnauthorized(handler: UnauthorizedHandler): () => void {
     this.unauthorizedHandlers.add(handler);
 
     // return unsubscribe function
