@@ -1,6 +1,11 @@
 :root {
   box-sizing: border-box;
 
+  --fs-base: 0.8rem;
+  --fs-reg: calc(var(--fs-base) * 1);
+  --fs-lg: calc(var(--fs-base) * 1.02);
+  --fs-xl: calc(var(--fs-base) * 1.04);
+
   --clr-primary: #000;
   --clr-accent: #39c;
 
@@ -11,7 +16,15 @@
   --spacing-xl: 1.5em;
   --spacing-xxl: 2em;
 
+  --max-width-phone: 500px;
+  --max-width-tablet: 800px;
+  --max-width-laptop: 1000px;
+  --max-width-desktop: 1200px;
+
   --spacing-current: var(--spacing-reg);
+  --max-width-current: var(--max-width-phone);
+
+  font-size: var(--fs-base);
 }
 
 body {
@@ -36,9 +49,9 @@ h6 {
   margin: 0;
 }
 
-.main-content-wrapper {
+.content-wrapper {
   padding: var(--spacing-reg);
-  max-width: 1280px;
+  max-width: var(--max-width-current);
   margin: 0 auto;
 }
 

@@ -1,35 +1,20 @@
 import { useState } from 'react';
-import type { AuthUser } from '../models/users/Users';
-import { getMe, login } from '../api/authService';
-import { ApiError } from '../errors/ApiError';
+import { useAuth } from '../context/useAuth';
+import { useNavigate } from 'react-router';
 
 export default function LoginPage() {
-  const [user, setUser] = useState<AuthUser | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
-  const isAuthenticated = user !== null;
-  console.log('is authenticated?', isAuthenticated);
-  console.log('user in state', user);
+  const navigate = useNavigate();
+
+  const { user, login, isAuthenticated, isLoading, errorMessage, logout } =
+    useAuth();
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    setError(null);
-    setIsLoading(true);
-
-    try {
-      await login(email, password);
-      const result = await getMe();
-      setUser(result.data);
-    } catch (err) {
-      if (err instanceof ApiError) {
-        setError(err.message);
-      }
-    } finally {
-      setIsLoading(false);
-    }
+    await login(email, password);
+    navigate('/notes');
   }
   return (
     <div>
@@ -58,7 +43,12 @@ export default function LoginPage() {
         <button type='submit' disabled={isLoading}>
           {isLoading ? 'Logging in...' : 'Login'}
         </button>
-        {error !== null && <p style={{ color: 'red' }}>{error}</p>}
+        <button type='button' onClick={logout}>
+          Call Logout
+        </button>
+        {errorMessage !== null && (
+          <p style={{ color: 'red' }}>{errorMessage}</p>
+        )}
       </form>
     </div>
   );

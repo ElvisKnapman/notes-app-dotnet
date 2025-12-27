@@ -6,7 +6,7 @@ import type {
 } from '../models/notes/Notes';
 import { http } from './http';
 
-export interface LoadNotesParams {
+export interface GetNotesParams {
   pageNumber?: number;
   pageSize?: number;
   searchTerm?: string;
@@ -14,7 +14,7 @@ export interface LoadNotesParams {
   descending?: boolean;
 }
 
-interface LoadNotesResponse {
+interface GetNotesResponse {
   data: {
     totalCount: number;
     pageNumber: number;
@@ -29,9 +29,9 @@ export interface SingleNoteResponse {
   success: boolean;
 }
 
-export async function loadNotes(
-  params: LoadNotesParams = {}
-): Promise<LoadNotesResponse> {
+export async function getNotes(
+  params: GetNotesParams = {}
+): Promise<GetNotesResponse> {
   const {
     pageNumber = 1,
     pageSize = 10,
@@ -48,7 +48,7 @@ export async function loadNotes(
     descending: descending.toString(),
   });
 
-  return http<LoadNotesResponse>(`${API_BASE_URL}/notes?${query.toString()}`);
+  return http<GetNotesResponse>(`${API_BASE_URL}/notes?${query.toString()}`);
 }
 
 export async function createNote(
@@ -70,6 +70,6 @@ export async function updateNote(
   });
 }
 
-export async function deleteAsync(id: string): Promise<void> {
+export async function deleteNote(id: string): Promise<void> {
   return http<void>(`${API_BASE_URL}/notes/${id}`);
 }
