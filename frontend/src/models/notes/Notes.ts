@@ -7,12 +7,6 @@ export interface Note {
   userId: string;
 }
 
-export interface CreateNoteDTO {
-  title: string;
-  content: string;
-}
+export type CreateNoteRequest = Pick<Note, 'title' | 'content'>;
 
-export interface UpdateNoteDTO {
-  title?: string;
-  content?: string;
-}
+export type UpdateNoteRequest = Partial<Pick<Note, 'title' | 'content'>>;
