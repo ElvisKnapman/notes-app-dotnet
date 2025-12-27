@@ -1,0 +1,19 @@
+.note-grid-item {
+  padding: var(--spacing-current);
+  background-color: #eaeaea;
+  border-radius: 6px;
+}
+
+.note-item-info-flex {
+  display: flex;
+  align-items: center;
+}
+
+.note-item-title {
+  flex: 1 1 auto;
+}
+
+.note-item-options {
+  display: flex;
+  column-gap: var(--spacing-current);
+}
