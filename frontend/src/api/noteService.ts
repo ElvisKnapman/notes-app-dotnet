@@ -24,14 +24,26 @@ interface GetNotesResponse {
   success: boolean;
 }
 
-export interface SingleNoteResponse {
+export interface PagedResponse {
+  totalCount: number;
+  pageNumber: number;
+  pageSize: number;
+  items: Note[];
+}
+
+interface SingleNoteResponse {
   data: Note;
   success: boolean;
 }
 
+/* 
+  data is flattened in the following methods (returning data property) to not have to repeatedly
+  drill down into JSON response
+*/
+
 export async function getNotes(
   params: GetNotesParams = {}
-): Promise<GetNotesResponse> {
+): Promise<PagedResponse> {
   const {
     pageNumber = 1,
     pageSize = 10,
@@ -48,26 +60,38 @@ export async function getNotes(
     descending: descending.toString(),
   });
 
-  return http<GetNotesResponse>(`${API_BASE_URL}/notes?${query.toString()}`);
+  const result = await http<GetNotesResponse>(
+    `${API_BASE_URL}/notes?${query.toString()}`
+  );
+
+  return result.data;
 }
 
-export async function createNote(
-  newNote: CreateNoteRequest
-): Promise<SingleNoteResponse> {
-  return http<SingleNoteResponse>(`${API_BASE_URL}/notes`, {
+export async function getNoteById(id: string): Promise<Note> {
+  const result = await http<SingleNoteResponse>(`${API_BASE_URL}/notes/${id}`);
+
+  return result.data;
+}
+
+export async function createNote(newNote: CreateNoteRequest): Promise<Note> {
+  const result = await http<SingleNoteResponse>(`${API_BASE_URL}/notes`, {
     method: 'POST',
     body: JSON.stringify(newNote),
   });
+
+  return result.data;
 }
 
 export async function updateNote(
   id: string,
   updatedNote: UpdateNoteRequest
-): Promise<SingleNoteResponse> {
-  return http<SingleNoteResponse>(`${API_BASE_URL}/notes/${id}`, {
+): Promise<Note> {
+  const result = await http<SingleNoteResponse>(`${API_BASE_URL}/notes/${id}`, {
     method: 'PUT',
     body: JSON.stringify(updatedNote),
   });
+
+  return result.data;
 }
 
 export async function deleteNote(id: string): Promise<void> {
